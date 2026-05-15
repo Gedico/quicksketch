@@ -9,7 +9,18 @@ const register = async (req, res) => {
         res.json(result);
 
     } catch (err) {
-        res.status(400).json({ message: err.message });
+
+        let message = "Errore registrazione";
+
+        if (err.message === "EMAIL_EXISTS") {
+            message = "Email già in uso";
+        }
+
+        if (err.message === "USERNAME_EXISTS") {
+            message = "Username già in uso";
+        }
+
+        res.status(400).json({ message });
     }
 };
 

@@ -5,9 +5,14 @@ const jwt = require("jsonwebtoken");56
 /**** REGISTER LOGIC ***********************************************************/
 const registerUser = async ({ username, email, password }) => {
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-        throw new Error("Utente già esistente");
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+        throw new Error("EMAIL_EXISTS");
+    }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+        throw new Error("USERNAME_EXISTS");
     }
 
     const salt = await bcrypt.genSalt(10);
