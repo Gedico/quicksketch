@@ -1,0 +1,23 @@
+# Java / Spring Boot / Maven / Gradle
+.gradle/
+build/
+target/
+*.class
+.mvn/
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+
+# IDE e Editor
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Environment & Logs
+.env
+*.log
