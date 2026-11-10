@@ -15,19 +15,20 @@ public class Sketch {
 
     @Indexed
     private String authorUsername;
-    private String imageData; // Stringa Base64 del disegno estratto dalla Canvas HTML5
+
+    private String imageData; // Stringa Base64 del Canvas HTML5
     private Instant createdAt = Instant.now();
 
     // --- COSTRUTTORI ---
     public Sketch() {}
 
-    public Sketch(String word, String authorId, String authorUsername, String imageData) {
+    public Sketch(String word, String authorUsername, String imageData) {
         this.word = word;
         this.authorUsername = authorUsername;
         this.imageData = imageData;
     }
 
-    // --- GETTER E SETTER  ---
+    // --- GETTER E SETTER ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getWord() { return word; }
@@ -37,4 +38,4 @@ public class Sketch {
     public String getImageData() { return imageData; }
     public void setImageData(String imageData) { this.imageData = imageData; }
     public Instant getCreatedAt() { return createdAt; }
-}}
+}

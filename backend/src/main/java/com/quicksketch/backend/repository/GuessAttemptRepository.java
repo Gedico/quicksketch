@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 
 public interface GuessAttemptRepository extends MongoRepository<GuessAttempt, String> {
-    Optional<GuessAttempt> findByUserIdAndSketchId(String userId, String sketchId);
+    Optional<GuessAttempt> findByUsernameAndSketchId(String username, String sketchId);
 }

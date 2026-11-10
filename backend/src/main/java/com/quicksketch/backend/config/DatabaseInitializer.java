@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 @Configuration
+@Profile("seed")// Si attiva solo se lanci l'app col profilo 'seed'
 public class DatabaseInitializer {
 
     @Bean
