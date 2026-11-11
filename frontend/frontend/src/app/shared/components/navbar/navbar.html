@@ -1,0 +1,55 @@
+<nav class="navbar">
+  <div class="nav-brand">
+  <a routerLink="/" (click)="closeDropdown()">🎨 Quick<span class="logo-accent">Sketch</span></a>
+</div>
+
+  <div class="nav-right">
+    <!-- Trigger Menu Profilo / Utente -->
+    <div class="user-menu-container">
+      <button class="profile-btn" (click)="toggleDropdown()">
+        <span class="avatar-icon">👤</span>
+        <span class="user-label" *ngIf="authService.isLoggedIn()">Profilo</span>
+        <span class="user-label" *ngIf="!authService.isLoggedIn()">Account</span>
+        <span class="arrow" [class.open]="isDropdownOpen">▼</span>
+      </button>
+
+      <!-- Dropdown Menu a Tendina -->
+      <div class="dropdown-menu" *ngIf="isDropdownOpen">
+        
+        <!-- OPZIONI QUANDO L'UTENTE È AUTENTICATO -->
+        <ng-container *ngIf="authService.isLoggedIn()">
+          <div class="dropdown-header">
+            <p class="status-title">Connesso</p>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a routerLink="/gallery" (click)="closeDropdown()" class="dropdown-item">
+            🖼️ Galleria Sketch
+          </a>
+          <a routerLink="/profile" (click)="closeDropdown()" class="dropdown-item">
+            ⚙️ Impostazioni
+          </a>
+          <div class="dropdown-divider"></div>
+          <button (click)="onLogout()" class="dropdown-item logout-item">
+            🚪 Logout
+          </button>
+        </ng-container>
+
+        <!-- OPZIONI QUANDO L'UTENTE NON È AUTENTICATO -->
+        <ng-container *ngIf="!authService.isLoggedIn()">
+          <div class="dropdown-header">
+            <p class="status-title">Benvenuto!</p>
+            <p class="status-sub">Accedi o registrati per giocare</p>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a routerLink="/login" (click)="closeDropdown()" class="dropdown-item font-bold">
+            🔑 Accedi
+          </a>
+          <a routerLink="/register" (click)="closeDropdown()" class="dropdown-item highlight-item">
+            ✨ Crea Account
+          </a>
+        </ng-container>
+
+      </div>
+    </div>
+  </div>
+</nav>

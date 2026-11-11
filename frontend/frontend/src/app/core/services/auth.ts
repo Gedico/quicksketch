@@ -1,39 +1,40 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-
-export interface AuthResponse {
-  token: string;
-}
+import { LoginRequestDto, RegisterRequestDto } from '../dto/auth';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080/api/auth';
-  private tokenKey = 'quicksketch_jwt_token';
+  private readonly apiUrl = 'http://localhost:8080/api/auth';
+
+  // State in memoria senza toccare localStorage (Anti-XSS)
+  isAuthenticatedSignal = signal<boolean>(false);
 
   constructor(private http: HttpClient) {}
 
-  login(credentials: { username: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        if (response && response.token) {
-          localStorage.setItem(this.tokenKey, response.token);
-        }
+  register(request: RegisterRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, request);
+  }
+
+  login(request: LoginRequestDto): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, request, { responseType: 'text' }).pipe(
+      tap(() => {
+        this.isAuthenticatedSignal.set(true);
       })
     );
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
-  logout(): void {
-    localStorage.removeItem(this.tokenKey);
+  logout(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/logout`, {}, { responseType: 'text' }).pipe(
+      tap(() => {
+        this.isAuthenticatedSignal.set(false);
+      })
+    );
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return this.isAuthenticatedSignal();
   }
 }

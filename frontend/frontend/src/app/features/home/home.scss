@@ -1,0 +1,65 @@
+$accent-yellow: #ffee00;
+$bg-card: #1e1e1e;
+
+.home-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  text-align: center;
+  color: #ffffff;
+
+  .hero {
+    padding: 3rem 1rem;
+    background: $bg-card;
+    border: 1px solid #333;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      .accent { color: $accent-yellow; }
+    }
+
+    p { color: #aaa; font-size: 1.1rem; }
+
+    .hero-actions {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+
+      .welcome-msg {
+        color: $accent-yellow;
+        font-weight: 600;
+      }
+
+      .btn {
+        padding: 0.6rem 1.4rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+
+        &-primary {
+          background-color: $accent-yellow;
+          color: #121212;
+        }
+
+        &-secondary {
+          background-color: #333;
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .sketch-placeholder-section {
+    .placeholder-box {
+      border: 2px dashed #444;
+      padding: 3rem;
+      border-radius: 12px;
+      color: #777;
+      background: #181818;
+    }
+  }
+}

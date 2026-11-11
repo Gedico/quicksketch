@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+// ==========================================
+// QUICKSKETCH THEME VARIABLES
+// ==========================================
+$bg-dark: #121212;
+$bg-card: #1e1e1e;
+$border-color: #333333;
+
+$text-light: #f8f9fa;
+$text-muted: #a0a0a0;
+
+// Accento principale (Giallo Acceso)
+$accent-yellow: #ffee00;
+$accent-yellow-hover: #e6d700;
+
+// Danger / Alert
+$danger-red: #ff4d4d;
+
+// Reset base
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: $bg-dark;
+  color: $text-light;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}

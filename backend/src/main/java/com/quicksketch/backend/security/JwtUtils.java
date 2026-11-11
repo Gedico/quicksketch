@@ -1,9 +1,14 @@
 package com.quicksketch.backend.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -12,14 +17,45 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    @Value("${jwt.secret:QuickSketchSuperSecretKeyForJWTTokenGeneration2026!}")
+    @Value("${quicksketch.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${jwt.expirationMs:86400000}") // 24 ore
+    @Value("${quicksketch.app.jwtExpirationMs:900000}")
     private int jwtExpirationMs;
 
+    @Value("${quicksketch.app.jwtCookieName:quicksketch_jwt}")
+    private String jwtCookie;
+
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public ResponseCookie generateJwtCookie(String username) {
+        String jwt = generateToken(username);
+        return ResponseCookie.from(jwtCookie, jwt)
+                .path("/api")
+                .maxAge(24 * 60 * 60)
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .build();
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(jwtCookie, "")
+                .path("/api")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
+    }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
+        if (cookie != null) {
+            return cookie.getValue();
+        }
+        return null;
     }
 
     public String generateToken(String username) {
@@ -29,6 +65,10 @@ public class JwtUtils {
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    public String generateTokenFromUsername(String username) {
+        return generateToken(username);
     }
 
     public String getUsernameFromJwtToken(String token) {
@@ -42,10 +82,14 @@ public class JwtUtils {
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(authToken);
+            Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(authToken);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+        } catch (Exception e) {
+            // Token scaduto o non valido
         }
+        return false;
     }
 }
