@@ -4,7 +4,7 @@
       <h1>{{ authService.isAuthenticatedSignal() ? 'Sketch da Indovinare' : 'Galleria degli Sketch' }}</h1>
       <p class="subtitle">
         {{ authService.isAuthenticatedSignal()
-          ? 'Metti alla prova il tuo colpo d’occhio sui disegni degli altri utenti (1 solo tentativo per sketch!)'
+          ? 'Metti alla prova il tuo colpo d’occhio sui disegni degli altri utenti (10 tentativi per sketch)'
           : 'Esplora i disegni della community. Accedi per creare i tuoi sketch e indovinare quelli degli altri!' }}
       </p>
     </div>
@@ -22,17 +22,50 @@
     {{ errorMessage }}
   </div>
 
-  <!-- Messaggio vuoto differenziato -->
+  <!-- Sezione Partite in sospeso (visibile solo se loggato e se ci sono partite iniziate non finite) -->
+  <section *ngIf="!isLoading && authService.isAuthenticatedSignal() && inProgressGuesses.length > 0" class="in-progress-section">
+    <div class="section-title-row">
+      <h2>Partite in sospeso ({{ inProgressGuesses.length }})</h2>
+      <span class="section-hint">Riprendi da dove avevi lasciato: i tentativi già usati restano salvati.</span>
+    </div>
+
+    <div class="sketches-grid">
+      <div *ngFor="let item of inProgressGuesses" class="sketch-card in-progress-card">
+        <div class="badge-in-progress">
+          Tentativi: {{ item.attemptsUsed }} / {{ item.maxAttempts }}
+        </div>
+
+        <div class="image-wrapper">
+          <img [src]="item.imageData" [alt]="'Sketch in sospeso di ' + item.authorUsername" />
+        </div>
+
+        <div class="card-footer">
+          <span class="author">Di <strong>{{ item.authorUsername }}</strong></span>
+          <span class="date">Iniziata: {{ item.startedAt | date:'dd/MM HH:mm' }}</span>
+        </div>
+
+        <div class="card-action">
+          <a [routerLink]="['/guess', item.sketchId]" class="btn-resume">
+            Riprendi partita
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Messaggio vuoto per gli sketch nuovi -->
   <div *ngIf="!isLoading && !errorMessage && sketches.length === 0" class="status-box">
     <ng-container *ngIf="authService.isAuthenticatedSignal(); else publicEmpty">
-      Hai già tentato tutti gli sketch disponibili degli altri utenti! Crea un nuovo disegno o torna più tardi.
+      Non ci sono nuovi sketch da scoprire al momento!
+      <span *ngIf="inProgressGuesses.length > 0">Completa le tue partite in sospeso qui sopra oppure crea un nuovo disegno.</span>
+      <span *ngIf="inProgressGuesses.length === 0">Crea un nuovo disegno o torna più tardi.</span>
     </ng-container>
     <ng-template #publicEmpty>
       Nessuno sketch ancora presente. Registrati o accedi per disegnarne uno!
     </ng-template>
   </div>
 
-  <!-- Griglia sketch -->
+  <!-- Griglia nuovi sketch giocabili o galleria pubblica -->
   <div *ngIf="!isLoading && sketches.length > 0" class="sketches-grid">
     <div *ngFor="let sketch of sketches" class="sketch-card">
       <div class="image-wrapper">
@@ -44,7 +77,6 @@
         <span class="date">{{ sketch.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
       </div>
 
-      <!-- Azione visibile SOLO all'utente autenticato (predisposta per il prossimo step: Indovina Sketch) -->
       <div *ngIf="authService.isAuthenticatedSignal()" class="card-action">
         <a [routerLink]="['/guess', sketch.id]" class="btn-guess">
           Indovina parola

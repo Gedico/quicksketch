@@ -1,0 +1,118 @@
+<div class="guess-container">
+  <div class="top-bar">
+    <a routerLink="/" class="back-link">← Torna alla Home</a>
+    <span class="hint-exit" *ngIf="session?.status === 'IN_PROGRESS'">
+      Se esci ora, potrai riprendere la partita dai tentativi rimasti.
+    </span>
+  </div>
+
+  <div *ngIf="isLoading" class="status-box">
+    Caricamento sketch in corso...
+  </div>
+
+  <div *ngIf="errorMessage && !session" class="error-box">
+    <p>{{ errorMessage }}</p>
+    <a routerLink="/" class="btn-primary">Torna agli sketch</a>
+  </div>
+
+  <div *ngIf="session" class="game-card">
+    <div class="game-header">
+      <div>
+        <h1>Indovina lo Sketch</h1>
+        <p class="author">Disegnato da <strong>{{ session.authorUsername }}</strong></p>
+      </div>
+
+      <div class="attempts-badge" [class.warning]="session.attemptsRemaining <= 3 && session.status === 'IN_PROGRESS'">
+        Tentativi: <strong>{{ session.attemptsUsed }} / {{ session.maxAttempts }}</strong>
+      </div>
+    </div>
+
+    <!-- Immagine dello sketch -->
+    <div class="canvas-display">
+      <img [src]="session.imageData" [alt]="'Sketch di ' + session.authorUsername" />
+    </div>
+
+    <!-- Stato IN CORSO -->
+    <div *ngIf="session.status === 'IN_PROGRESS'" class="play-controls">
+      <form (ngSubmit)="onSubmitGuess()" class="guess-form">
+        <input
+          type="text"
+          [(ngModel)]="guessInput"
+          name="guessWord"
+          placeholder="Scrivi cosa rappresenta il disegno..."
+          autocomplete="off"
+          [disabled]="isSubmitting"
+          autofocus
+        />
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting || !guessInput.trim()">
+          {{ isSubmitting ? 'Verifica...' : 'Prova' }}
+        </button>
+      </form>
+
+      <div *ngIf="feedbackMessage" class="feedback-banner">
+        {{ feedbackMessage }}
+      </div>
+
+      <div *ngIf="errorMessage" class="error-inline">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Parole già tentate -->
+      <div *ngIf="session.attemptedWords.length > 0" class="attempted-list">
+        <span class="attempted-label">Già provate:</span>
+        <span *ngFor="let word of session.attemptedWords" class="word-chip">
+          {{ word }}
+        </span>
+      </div>
+
+      <!-- Pulsante Arrenditi con conferma -->
+      <div class="surrender-area">
+        <button
+          *ngIf="!confirmSurrender"
+          type="button"
+          class="btn-surrender"
+          (click)="confirmSurrender = true"
+          [disabled]="isSubmitting"
+        >
+          Arrenditi
+        </button>
+
+        <div *ngIf="confirmSurrender" class="surrender-confirm">
+          <span>Sei sicuro? La partita verrà segnata come persa e scoprirai la parola.</span>
+          <div class="confirm-buttons">
+            <button type="button" class="btn-danger" (click)="onSurrender()" [disabled]="isSubmitting">
+              Sì, arrenditi
+            </button>
+            <button type="button" class="btn-secondary" (click)="confirmSurrender = false" [disabled]="isSubmitting">
+              Continua a giocare
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stato VITTORIA -->
+    <div *ngIf="session.status === 'WON'" class="result-box won">
+      <h2>Complimenti, hai indovinato!</h2>
+      <p>
+        La parola segreta era: <strong class="secret-word">{{ session.secretWord | uppercase }}</strong>
+      </p>
+      <p class="stats-note">
+        Hai indovinato in <strong>{{ session.attemptsUsed }}</strong> {{ session.attemptsUsed === 1 ? 'tentativo' : 'tentativi' }}.
+      </p>
+      <a routerLink="/" class="btn-primary">Gioca un altro sketch</a>
+    </div>
+
+    <!-- Stato SCONFITTA (10 tentativi esauriti o Resa) -->
+    <div *ngIf="session.status === 'LOST'" class="result-box lost">
+      <h2>Partita terminata</h2>
+      <p>
+        La parola da indovinare era: <strong class="secret-word">{{ session.secretWord | uppercase }}</strong>
+      </p>
+      <p class="stats-note">
+        Tentativi utilizzati: {{ session.attemptsUsed }} / {{ session.maxAttempts }}
+      </p>
+      <a routerLink="/" class="btn-primary">Torna alla Home</a>
+    </div>
+  </div>
+</div>

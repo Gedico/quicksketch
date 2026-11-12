@@ -3,6 +3,8 @@ package com.quicksketch.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "sketches")
 public class Sketch {
@@ -46,4 +48,19 @@ public class Sketch {
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+
+//---------------------  METODI AUSILIARI  -------------------------------------------------
+    private List<String> playedByUsernames = new ArrayList<>();
+
+    public List<String> getPlayedByUsernames() {
+        if (playedByUsernames == null) {
+            playedByUsernames = new ArrayList<>();
+        }
+        return playedByUsernames;
+    }
+
+    public void setPlayedByUsernames(List<String> playedByUsernames) {
+        this.playedByUsernames = playedByUsernames;
+    }
 }

@@ -10,6 +10,7 @@ import com.quicksketch.backend.repository.GuessRepository;
 import com.quicksketch.backend.repository.SketchRepository;
 import com.quicksketch.backend.service.SketchService;
 import org.springframework.stereotype.Service;
+import com.quicksketch.backend.repository.UserRepository;
 
 import java.util.List;
 
@@ -18,13 +19,16 @@ public class SketchServiceImpl implements SketchService {
 
     private final SketchRepository sketchRepository;
     private final GuessRepository guessRepository;
+    private final UserRepository userRepository;
     private final SketchMapper sketchMapper;
 
     public SketchServiceImpl(SketchRepository sketchRepository,
                              GuessRepository guessRepository,
+                             UserRepository userRepository,
                              SketchMapper sketchMapper) {
         this.sketchRepository = sketchRepository;
         this.guessRepository = guessRepository;
+        this.userRepository = userRepository;
         this.sketchMapper = sketchMapper;
     }
 
@@ -56,6 +60,10 @@ public class SketchServiceImpl implements SketchService {
         sketch.setCompleted(true);
 
         Sketch updated = sketchRepository.save(sketch);
+        userRepository.findByUsername(authorUsername).ifPresent(author -> {
+            author.setSketchesCreated(author.getSketchesCreated() + 1);
+            userRepository.save(author);
+        });
         return sketchMapper.toResponse(updated);
     }
 

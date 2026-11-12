@@ -134,3 +134,68 @@
   opacity: 0.9;
   transform: translateY(-1px);
 }
+
+.in-progress-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #2e2e2e;
+}
+
+.section-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-title-row h2 {
+  margin: 0;
+  color: #ffee00;
+  font-size: 1.25rem;
+}
+
+.section-hint {
+  color: #a0a0a0;
+  font-size: 0.9rem;
+}
+
+.in-progress-card {
+  position: relative;
+  border: 1px solid rgba(255, 238, 0, 0.45);
+}
+
+.badge-in-progress {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  background-color: #181818;
+  color: #ffee00;
+  border: 1px solid #ffee00;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.btn-resume {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  background-color: transparent;
+  color: #ffee00;
+  border: 2px solid #ffee00;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-resume:hover {
+  background-color: #ffee00;
+  color: #121212;
+}

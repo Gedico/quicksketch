@@ -3,6 +3,7 @@ import { HomeComponent } from './features/home/home';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
 import { CreateSketchComponent } from './features/create-sketch/create-sketch';
+import { GuessSketchComponent } from './features/guess-sketch/guess-sketch';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -10,5 +11,6 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'create', component: CreateSketchComponent },
+  { path: 'guess/:id',component: GuessSketchComponent},
   { path: '**', redirectTo: '' }
 ];

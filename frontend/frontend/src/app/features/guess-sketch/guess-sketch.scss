@@ -1,0 +1,258 @@
+.guess-container {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #f5f5f5;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.back-link {
+  color: #ffee00;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.hint-exit {
+  font-size: 0.85rem;
+  color: #9e9e9e;
+}
+
+.game-card {
+  background-color: #1e1e1e;
+  border: 1px solid #303030;
+  border-radius: 14px;
+  padding: 1.75rem;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.game-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.author {
+  margin: 0.25rem 0 0 0;
+  color: #b0b0b0;
+}
+
+.attempts-badge {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  padding: 0.5rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+}
+
+.attempts-badge.warning {
+  border-color: #ff5252;
+  color: #ff8a80;
+}
+
+.canvas-display {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border: 2px solid #333;
+}
+
+.canvas-display img {
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+}
+
+.guess-form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.guess-form input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background-color: #141414;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.guess-form input:focus {
+  outline: none;
+  border-color: #ffee00;
+}
+
+.btn-primary {
+  display: inline-block;
+  background-color: #ffee00;
+  color: #121212;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.feedback-banner {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: rgba(255, 238, 0, 0.12);
+  border: 1px solid rgba(255, 238, 0, 0.4);
+  color: #ffee00;
+  font-weight: 500;
+}
+
+.error-inline {
+  margin-top: 0.75rem;
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
+
+.attempted-list {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attempted-label {
+  font-size: 0.88rem;
+  color: #9e9e9e;
+}
+
+.word-chip {
+  background-color: #2b2b2b;
+  border: 1px solid #3f3f3f;
+  color: #d4d4d4;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  text-decoration: line-through;
+}
+
+.surrender-area {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #2e2e2e;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-surrender {
+  background: transparent;
+  border: 1px solid #ff5252;
+  color: #ff6b6b;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-surrender:hover {
+  background-color: rgba(255, 82, 82, 0.12);
+}
+
+.surrender-confirm {
+  width: 100%;
+  background-color: rgba(255, 82, 82, 0.1);
+  border: 1px solid #ff5252;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-danger {
+  background-color: #ff5252;
+  color: #ffffff;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #333;
+  color: #f5f5f5;
+  border: none;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.result-box {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.result-box.won {
+  background-color: rgba(76, 175, 80, 0.14);
+  border: 1px solid #4caf50;
+}
+
+.result-box.lost {
+  background-color: rgba(255, 82, 82, 0.14);
+  border: 1px solid #ff5252;
+}
+
+.secret-word {
+  color: #ffee00;
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+}
+
+.stats-note {
+  color: #cccccc;
+  margin-bottom: 1.5rem;
+}
+
+.status-box,
+.error-box {
+  text-align: center;
+  padding: 2rem;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+}
