@@ -28,4 +28,10 @@ export class SketchService {
   getAllSketches(): Observable<SketchResponse[]> {
     return this.http.get<SketchResponse[]>(this.apiUrl);
   }
+
+  getPlayableSketches(): Observable<SketchResponse[]> {
+    return this.http.get<SketchResponse[]>(`${this.apiUrl}/playable`, {
+      withCredentials: true
+    });
+  }
 }

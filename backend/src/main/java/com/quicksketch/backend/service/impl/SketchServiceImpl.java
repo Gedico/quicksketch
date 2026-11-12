@@ -1,7 +1,12 @@
 package com.quicksketch.backend.service.impl;
 
-import com.quicksketch.backend.dto.sketch.*;
+import com.quicksketch.backend.dto.sketch.CompleteSketchRequest;
+import com.quicksketch.backend.dto.sketch.SketchResponse;
+import com.quicksketch.backend.dto.sketch.StartSketchRequest;
+import com.quicksketch.backend.mapper.SketchMapper;
+import com.quicksketch.backend.model.Guess;
 import com.quicksketch.backend.model.Sketch;
+import com.quicksketch.backend.repository.GuessRepository;
 import com.quicksketch.backend.repository.SketchRepository;
 import com.quicksketch.backend.service.SketchService;
 import org.springframework.stereotype.Service;
@@ -12,9 +17,15 @@ import java.util.List;
 public class SketchServiceImpl implements SketchService {
 
     private final SketchRepository sketchRepository;
+    private final GuessRepository guessRepository;
+    private final SketchMapper sketchMapper;
 
-    public SketchServiceImpl(SketchRepository sketchRepository) {
+    public SketchServiceImpl(SketchRepository sketchRepository,
+                             GuessRepository guessRepository,
+                             SketchMapper sketchMapper) {
         this.sketchRepository = sketchRepository;
+        this.guessRepository = guessRepository;
+        this.sketchMapper = sketchMapper;
     }
 
     @Override
@@ -25,13 +36,7 @@ public class SketchServiceImpl implements SketchService {
         );
 
         Sketch saved = sketchRepository.save(sketch);
-
-        return new SketchResponse(
-                saved.getId(),
-                saved.getAuthorUsername(),
-                saved.getImageData(),
-                saved.getCreatedAt()
-        );
+        return sketchMapper.toResponse(saved);
     }
 
     @Override
@@ -51,25 +56,32 @@ public class SketchServiceImpl implements SketchService {
         sketch.setCompleted(true);
 
         Sketch updated = sketchRepository.save(sketch);
-
-        return new SketchResponse(
-                updated.getId(),
-                updated.getAuthorUsername(),
-                updated.getImageData(),
-                updated.getCreatedAt()
-        );
+        return sketchMapper.toResponse(updated);
     }
 
     @Override
     public List<SketchResponse> getAllSketches() {
         return sketchRepository.findAllByCompletedTrueOrderByCreatedAtDesc()
                 .stream()
-                .map(s -> new SketchResponse(
-                        s.getId(),
-                        s.getAuthorUsername(),
-                        s.getImageData(),
-                        s.getCreatedAt()
-                ))
+                .map(sketchMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<SketchResponse> getPlayableSketches(String username) {
+        List<String> attemptedSketchIds = guessRepository.findByUsername(username)
+                .stream()
+                .map(Guess::getSketchId)
+                .toList();
+
+        if (attemptedSketchIds.isEmpty()) {
+            attemptedSketchIds = List.of("NONE");
+        }
+
+        return sketchRepository
+                .findByCompletedTrueAndAuthorUsernameNotAndIdNotInOrderByCreatedAtDesc(username, attemptedSketchIds)
+                .stream()
+                .map(sketchMapper::toResponse)
                 .toList();
     }
 }

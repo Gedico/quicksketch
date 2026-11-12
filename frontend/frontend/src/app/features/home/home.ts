@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SketchService } from '../../core/services/sketch';
@@ -12,7 +12,7 @@ import { SketchResponse } from '../../core/dto/sketch/sketch-response';
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent {
   sketches: SketchResponse[] = [];
   isLoading: boolean = true;
   errorMessage: string = '';
@@ -20,24 +20,30 @@ export class HomeComponent implements OnInit {
   constructor(
     private sketchService: SketchService,
     public authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    this.loadAllSketches();
+  ) {
+    // Reagisce automaticamente allo stato di autenticazione (login / logout / caricamento iniziale)
+    effect(() => {
+      const isLoggedIn = this.authService.isAuthenticatedSignal();
+      this.loadSketches(isLoggedIn);
+    });
   }
 
-  loadAllSketches(): void {
+  loadSketches(isLoggedIn: boolean): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.sketchService.getAllSketches().subscribe({
+    const request$ = isLoggedIn
+      ? this.sketchService.getPlayableSketches()
+      : this.sketchService.getAllSketches();
+
+    request$.subscribe({
       next: (data) => {
         this.sketches = data;
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Errore nel caricamento degli sketch:', err);
-        this.errorMessage = 'Impossibile caricare la galleria degli sketch.';
+        this.errorMessage = 'Impossibile caricare gli sketch al momento.';
         this.isLoading = false;
       }
     });

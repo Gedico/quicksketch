@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class SketchController {
     public ResponseEntity<List<SketchResponse>> getAllSketches() {
         return ResponseEntity.ok(sketchService.getAllSketches());
     }
+
+
+//--------------------  CREATE SKETCH  ---------------------------------------------------
 
     // FASE 1: Restituisce 3 parole casuali tra cui scegliere
     @GetMapping("/word-options")
@@ -48,5 +52,17 @@ public class SketchController {
                                                          Authentication authentication) {
         String authorUsername = authentication.getName();
         return ResponseEntity.ok(sketchService.completeSketch(id, authorUsername, request));
+    }
+
+
+//---------------------  VISUALIZZAZIONE CONDIZIONATA  ---------------------------------------------
+
+    @GetMapping("/playable")
+    public ResponseEntity<List<SketchResponse>> getPlayableSketches(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String username = authentication.getName();
+        return ResponseEntity.ok(sketchService.getPlayableSketches(username));
     }
 }

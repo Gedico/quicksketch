@@ -1,11 +1,14 @@
 <div class="home-container">
   <div class="home-header">
     <div>
-      <h1>Galleria degli Sketch</h1>
-      <p class="subtitle">Esplora tutti i disegni realizzati dalla community</p>
+      <h1>{{ authService.isAuthenticatedSignal() ? 'Sketch da Indovinare' : 'Galleria degli Sketch' }}</h1>
+      <p class="subtitle">
+        {{ authService.isAuthenticatedSignal()
+          ? 'Metti alla prova il tuo colpo d’occhio sui disegni degli altri utenti (1 solo tentativo per sketch!)'
+          : 'Esplora i disegni della community. Accedi per creare i tuoi sketch e indovinare quelli degli altri!' }}
+      </p>
     </div>
 
-    <!-- Pulsante creazione visibile se autenticato (adatta la condizione al tuo segnale/metodo di auth) -->
     <a *ngIf="authService.isAuthenticatedSignal()" routerLink="/create" class="btn-create-sketch">
       + Crea Sketch
     </a>
@@ -19,11 +22,17 @@
     {{ errorMessage }}
   </div>
 
+  <!-- Messaggio vuoto differenziato -->
   <div *ngIf="!isLoading && !errorMessage && sketches.length === 0" class="status-box">
-    Nessuno sketch ancora presente. Sii il primo a disegnarne uno!
+    <ng-container *ngIf="authService.isAuthenticatedSignal(); else publicEmpty">
+      Hai già tentato tutti gli sketch disponibili degli altri utenti! Crea un nuovo disegno o torna più tardi.
+    </ng-container>
+    <ng-template #publicEmpty>
+      Nessuno sketch ancora presente. Registrati o accedi per disegnarne uno!
+    </ng-template>
   </div>
 
-  <!-- Griglia pubblica di tutti gli sketch completati -->
+  <!-- Griglia sketch -->
   <div *ngIf="!isLoading && sketches.length > 0" class="sketches-grid">
     <div *ngFor="let sketch of sketches" class="sketch-card">
       <div class="image-wrapper">
@@ -31,8 +40,15 @@
       </div>
 
       <div class="card-footer">
-        <span class="author">Disegnato da <strong>{{ sketch.authorUsername }}</strong></span>
+        <span class="author">Di <strong>{{ sketch.authorUsername }}</strong></span>
         <span class="date">{{ sketch.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <!-- Azione visibile SOLO all'utente autenticato (predisposta per il prossimo step: Indovina Sketch) -->
+      <div *ngIf="authService.isAuthenticatedSignal()" class="card-action">
+        <a [routerLink]="['/guess', sketch.id]" class="btn-guess">
+          Indovina parola
+        </a>
       </div>
     </div>
   </div>

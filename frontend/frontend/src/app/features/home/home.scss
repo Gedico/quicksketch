@@ -110,3 +110,27 @@
   border: 1px solid #ff4d4d;
   border-radius: 8px;
 }
+
+
+.card-action {
+  padding: 0 1rem 1rem 1rem;
+}
+
+.btn-guess {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  background-color: #ffee00;
+  color: #121212;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn-guess:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}

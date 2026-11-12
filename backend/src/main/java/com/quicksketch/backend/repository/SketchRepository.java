@@ -2,12 +2,18 @@ package com.quicksketch.backend.repository;
 
 import com.quicksketch.backend.model.Sketch;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
-@Repository
 public interface SketchRepository extends MongoRepository<Sketch, String> {
-    long countByAuthorUsernameAndCompletedTrue(String authorUsername);
+
+    // Per la galleria pubblica (utenti non loggati)
     List<Sketch> findAllByCompletedTrueOrderByCreatedAtDesc();
+
+    // Per la vista giocabile (utenti loggati: esclude i propri e quelli già tentati)
+    List<Sketch> findByCompletedTrueAndAuthorUsernameNotAndIdNotInOrderByCreatedAtDesc(
+            String authorUsername,
+            Collection<String> excludedIds
+    );
 }
