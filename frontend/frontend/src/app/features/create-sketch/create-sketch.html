@@ -1,0 +1,148 @@
+<div class="sketch-page">
+  <!-- AREA DI LAVORO SEMPRE PRESENTE IN BACKGROUND -->
+  <div class="workspace-card">
+    <div class="workspace-header">
+      <div class="target-word">
+        <ng-container *ngIf="selectedWord; else waitingWord">
+          Parola: <span>{{ selectedWord | uppercase }}</span>
+        </ng-container>
+        <ng-template #waitingWord>
+          Seleziona una parola per iniziare...
+        </ng-template>
+      </div>
+
+      <div class="timer-badge" [class.urgent]="sessionState === 'DRAWING' && timeLeft <= 15">
+        ⏱ {{ formattedTime }}
+      </div>
+    </div>
+
+    <!-- Toolbar Strumenti -->
+    <div class="toolbar" [class.disabled]="isCanvasLocked">
+      <div class="color-palette">
+        <button
+          *ngFor="let color of availableColors"
+          type="button"
+          class="color-swatch"
+          [style.background-color]="color"
+          [class.active]="!isEraser && currentColor === color"
+          [disabled]="isCanvasLocked"
+          (click)="setColor(color)">
+        </button>
+      </div>
+
+      <div class="brush-controls">
+        <label for="brushSize">Tratto:</label>
+        <input
+          id="brushSize"
+          type="range"
+          min="2"
+          max="24"
+          [value]="brushSize"
+          [disabled]="isCanvasLocked"
+          (input)="brushSize = +$any($event.target).value" />
+      </div>
+
+      <div class="action-tools">
+        <button
+          type="button"
+          class="tool-btn"
+          [class.active]="isEraser"
+          [disabled]="isCanvasLocked"
+          (click)="activateEraser()">
+          Gomma
+        </button>
+        <button
+          type="button"
+          class="tool-btn danger"
+          [disabled]="isCanvasLocked"
+          (click)="clearCanvas()">
+          Pulisci
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas HTML5 -->
+    <div class="canvas-container">
+      <canvas
+        #sketchCanvas
+        width="680"
+        height="420"
+        [class.locked]="isCanvasLocked"
+        (mousedown)="startDrawing($event)"
+        (mousemove)="draw($event)"
+        (mouseup)="stopDrawing()"
+        (mouseleave)="stopDrawing()">
+      </canvas>
+    </div>
+
+    <div class="workspace-footer">
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="isCanvasLocked || isSaving"
+        (click)="finishAndSaveSketch()">
+        {{ isSaving ? 'Salvataggio in corso...' : 'Finito' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- POPUP 1: SCELTA DELLA PAROLA (Sfondo oscurato) -->
+  <div *ngIf="sessionState === 'SELECTING_WORD'" class="modal-backdrop">
+    <div class="modal-box">
+      <h2>Scegli una parola da disegnare</h2>
+      <p class="modal-subtitle">
+        Appena clicchi su una parola partirà il timer di <strong>2 minuti</strong>.
+      </p>
+
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="isLoadingWords" class="loading-text">
+        Caricamento parole in corso...
+      </div>
+
+      <div *ngIf="!isLoadingWords" class="word-options-grid">
+        <button
+          *ngFor="let word of wordOptions"
+          type="button"
+          class="word-choice-btn"
+          (click)="selectWord(word)">
+          {{ word | uppercase }}
+        </button>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="loadWordOptions()">
+          Altre 3 parole
+        </button>
+        <button type="button" class="btn-ghost" (click)="goToHome()">
+          Annulla
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POPUP 2: RIEPILOGO FINALE DOPO SALVATAGGIO AUTOMATICO -->
+  <div *ngIf="sessionState === 'COMPLETED'" class="modal-backdrop">
+    <div class="modal-box summary-box">
+      <h2>Complimenti!</h2>
+      <p class="summary-text">
+        Questo è il tuo sketch per <span class="highlight-word">{{ selectedWord | uppercase }}</span>:
+      </p>
+
+      <div class="sketch-preview-frame">
+        <img [src]="savedImagePreview" [alt]="selectedWord" />
+      </div>
+
+      <div class="summary-actions">
+        <button type="button" class="btn-secondary" (click)="goToHome()">
+          Home
+        </button>
+        <button type="button" class="btn-primary" (click)="startNewSketch()">
+          Crea un nuovo sketch
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,22 +1,39 @@
 <div class="home-container">
-  <header class="hero">
-    <h1>Benvenuto su Quick<span class="accent">Sketch</span></h1>
-    <p>Disegna, indovina e condividi le tue creazioni con la community.</p>
-    
-    <div class="hero-actions" *ngIf="!authService.isLoggedIn()">
-      <a routerLink="/register" class="btn btn-primary">Crea un Account</a>
-      <a routerLink="/login" class="btn btn-secondary">Accedi</a>
+  <div class="home-header">
+    <div>
+      <h1>Galleria degli Sketch</h1>
+      <p class="subtitle">Esplora tutti i disegni realizzati dalla community</p>
     </div>
 
-    <div class="hero-actions" *ngIf="authService.isLoggedIn()">
-      <p class="welcome-msg">Sei autenticato! Pronto a giocare?</p>
-    </div>
-  </header>
+    <!-- Pulsante creazione visibile se autenticato (adatta la condizione al tuo segnale/metodo di auth) -->
+    <a *ngIf="authService.isAuthenticatedSignal()" routerLink="/create" class="btn-create-sketch">
+      + Crea Sketch
+    </a>
+  </div>
 
-  <section class="sketch-placeholder-section">
-    <h3>🖼️ Galleria Sketch in arrivo</h3>
-    <div class="placeholder-box">
-      <p>Qui verranno mostrati gli sketch della community non appena collegheremo la galleria.</p>
+  <div *ngIf="isLoading" class="status-box">
+    Caricamento sketch in corso...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-box">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && sketches.length === 0" class="status-box">
+    Nessuno sketch ancora presente. Sii il primo a disegnarne uno!
+  </div>
+
+  <!-- Griglia pubblica di tutti gli sketch completati -->
+  <div *ngIf="!isLoading && sketches.length > 0" class="sketches-grid">
+    <div *ngFor="let sketch of sketches" class="sketch-card">
+      <div class="image-wrapper">
+        <img [src]="sketch.imageData" [alt]="'Sketch di ' + sketch.authorUsername" />
+      </div>
+
+      <div class="card-footer">
+        <span class="author">Disegnato da <strong>{{ sketch.authorUsername }}</strong></span>
+        <span class="date">{{ sketch.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
     </div>
-  </section>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-package com.quicksketch.backend.dto;
+package com.quicksketch.backend.dto.auth;
 
 public class AuthResponse {
     private String token;

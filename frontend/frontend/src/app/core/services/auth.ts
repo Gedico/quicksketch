@@ -19,20 +19,26 @@ export class AuthService {
   }
 
   login(request: LoginRequestDto): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, request, { responseType: 'text' }).pipe(
-      tap(() => {
-        this.isAuthenticatedSignal.set(true);
-      })
-    );
-  }
+  return this.http.post(`${this.apiUrl}/login`, request, {
+    responseType: 'text',
+    withCredentials: true
+  }).pipe(
+    tap(() => {
+      this.isAuthenticatedSignal.set(true);
+    })
+  );
+}
 
-  logout(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/logout`, {}, { responseType: 'text' }).pipe(
-      tap(() => {
-        this.isAuthenticatedSignal.set(false);
-      })
-    );
-  }
+logout(): Observable<any> {
+  return this.http.post(`${this.apiUrl}/logout`, {}, {
+    responseType: 'text',
+    withCredentials: true
+  }).pipe(
+    tap(() => {
+      this.isAuthenticatedSignal.set(false);
+    })
+  );
+}
 
   isLoggedIn(): boolean {
     return this.isAuthenticatedSignal();

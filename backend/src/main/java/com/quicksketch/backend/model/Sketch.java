@@ -2,7 +2,6 @@ package com.quicksketch.backend.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.Instant;
 
 @Document(collection = "sketches")
@@ -12,23 +11,24 @@ public class Sketch {
     private String id;
     private String authorUsername;
     private String word;
-    private String canvasData;
+    private String imageData;
+    private boolean completed;
     private Instant createdAt;
-    private boolean solved;
 
     public Sketch() {
         this.createdAt = Instant.now();
-        this.solved = false;
+        this.completed = false;
     }
 
-    public Sketch(String authorUsername, String word, String canvasData) {
+    public Sketch(String authorUsername, String word) {
         this.authorUsername = authorUsername;
         this.word = word;
-        this.canvasData = canvasData;
+        this.imageData = null;
+        this.completed = false;
         this.createdAt = Instant.now();
-        this.solved = false;
     }
 
+    // Getter e Setter
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -38,12 +38,12 @@ public class Sketch {
     public String getWord() { return word; }
     public void setWord(String word) { this.word = word; }
 
-    public String getCanvasData() { return canvasData; }
-    public void setCanvasData(String canvasData) { this.canvasData = canvasData; }
+    public String getImageData() { return imageData; }
+    public void setImageData(String imageData) { this.imageData = imageData; }
+
+    public boolean isCompleted() { return completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
 
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
-
-    public boolean isSolved() { return solved; }
-    public void setSolved(boolean solved) { this.solved = solved; }
 }

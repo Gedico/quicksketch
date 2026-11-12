@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface SketchRepository extends MongoRepository<Sketch, String> {
-    List<Sketch> findAllByOrderByCreatedAtDesc();
-    List<Sketch> findByAuthorUsername(String authorUsername);
+    long countByAuthorUsernameAndCompletedTrue(String authorUsername);
+    List<Sketch> findAllByCompletedTrueOrderByCreatedAtDesc();
 }

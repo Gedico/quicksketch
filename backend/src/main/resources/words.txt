@@ -1,0 +1,4 @@
+gatto, casa, albero, sole, bicicletta, chitarra, pizza, razzo, castello, montagna,
+computer, occhiali, orologio, farfalla, barca, telefono, gelato, drago, robot, lampada,
+ombrello, treno, pallone, stella, pesce, corona, chiave, libro, nuvola, vulcano,
+pinguino, torta, macchina, ponte, cuore, fungo, scala, candela, balena, cactus

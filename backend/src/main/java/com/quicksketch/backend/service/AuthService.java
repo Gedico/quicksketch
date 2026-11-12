@@ -1,13 +1,12 @@
 package com.quicksketch.backend.service;
 
-import com.quicksketch.backend.dto.AuthResponse;
-import com.quicksketch.backend.dto.RegisterRequest;
+import com.quicksketch.backend.dto.auth.*;
 import com.quicksketch.backend.model.User;
 import com.quicksketch.backend.repository.UserRepository;
 import com.quicksketch.backend.security.JwtUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.quicksketch.backend.dto.LoginRequest;
+
 
 @Service
 public class AuthService {
@@ -16,6 +15,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
+
+ //----------------     COSTRUTTORE  --------------------------
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

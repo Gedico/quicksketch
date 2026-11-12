@@ -1,7 +1,6 @@
 package com.quicksketch.backend.controller;
 
-import com.quicksketch.backend.dto.CreateSketchRequest;
-import com.quicksketch.backend.dto.SketchResponse;
+import com.quicksketch.backend.dto.sketch.*;
 import com.quicksketch.backend.service.SketchService;
 import com.quicksketch.backend.service.WordService;
 import jakarta.validation.Valid;
@@ -13,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sketches")
-@CrossOrigin(origins = "*")
 public class SketchController {
 
     private final SketchService sketchService;
@@ -29,11 +27,26 @@ public class SketchController {
         return ResponseEntity.ok(sketchService.getAllSketches());
     }
 
-    @PostMapping
-    public ResponseEntity<SketchResponse> createSketch(@Valid @RequestBody CreateSketchRequest request,
-                                                       Authentication authentication) {
+    // FASE 1: Restituisce 3 parole casuali tra cui scegliere
+    @GetMapping("/word-options")
+    public ResponseEntity<List<String>> getWordOptions() {
+        return ResponseEntity.ok(wordService.getRandomWords(3));
+    }
+
+    // FASE 2: Crea lo sketch con la parola scelta e fa partire la sessione (restituisce l'ID)
+    @PostMapping("/start")
+    public ResponseEntity<SketchResponse> startSketch(@Valid @RequestBody StartSketchRequest request,
+                                                      Authentication authentication) {
         String authorUsername = authentication.getName();
-        SketchResponse response = sketchService.createSketch(authorUsername, request);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(sketchService.startSketch(authorUsername, request));
+    }
+
+    // FASE 3: Salva il disegno al termine dei 2 minuti usando l'ID ricevuto in Fase 2
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<SketchResponse> completeSketch(@PathVariable String id,
+                                                         @Valid @RequestBody CompleteSketchRequest request,
+                                                         Authentication authentication) {
+        String authorUsername = authentication.getName();
+        return ResponseEntity.ok(sketchService.completeSketch(id, authorUsername, request));
     }
 }

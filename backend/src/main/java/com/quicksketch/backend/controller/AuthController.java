@@ -1,22 +1,24 @@
 package com.quicksketch.backend.controller;
 
-import com.quicksketch.backend.dto.AuthResponse;
-import com.quicksketch.backend.dto.RegisterRequest;
+import com.quicksketch.backend.dto.auth.*;
+import com.quicksketch.backend.security.JwtUtils;
 import com.quicksketch.backend.service.AuthService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.quicksketch.backend.dto.LoginRequest;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtUtils jwtUtils;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtUtils jwtUtils) {
         this.authService = authService;
+        this.jwtUtils = jwtUtils;
     }
 
 
@@ -24,8 +26,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            AuthResponse response = authService.register(request);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(authService.register(request));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -38,10 +39,26 @@ public class AuthController {
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
-            return ResponseEntity.ok(response);
+            ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(response.getUsername());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+
+
+//--------------  LOGOUT  ------------------------------
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        ResponseCookie cleanCookie = jwtUtils.getCleanJwtCookie();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cleanCookie.toString())
+                .body("Logout effettuato con successo");
     }
 
 }

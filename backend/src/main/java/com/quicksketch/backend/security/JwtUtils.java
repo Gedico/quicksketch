@@ -20,8 +20,8 @@ public class JwtUtils {
     @Value("${quicksketch.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("${quicksketch.app.jwtExpirationMs:900000}")
-    private int jwtExpirationMs;
+    @Value("${quicksketch.app.jwtExpirationMs:86400000}")
+    private long jwtExpirationMs;
 
     @Value("${quicksketch.app.jwtCookieName:quicksketch_jwt}")
     private String jwtCookie;
@@ -62,7 +62,7 @@ public class JwtUtils {
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(getSigningKey())
                 .compact();
     }

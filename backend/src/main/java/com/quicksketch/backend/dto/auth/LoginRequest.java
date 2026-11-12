@@ -1,4 +1,4 @@
-package com.quicksketch.backend.dto;
+package com.quicksketch.backend.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 

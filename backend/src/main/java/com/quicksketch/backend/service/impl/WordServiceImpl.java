@@ -10,38 +10,53 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class WordServiceImpl implements WordService {
 
     private final List<String> words = new ArrayList<>();
-    private final Random random = new Random();
 
     @PostConstruct
     public void loadWords() {
-        try {
-            ClassPathResource resource = new ClassPathResource("words.txt");
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)
-            );
-            String line = reader.readLine();
-            if (line != null && !line.trim().isEmpty()) {
-                String[] parsedWords = line.split(",");
-                for (String word : parsedWords) {
-                    words.add(word.trim().toLowerCase());
+        ClassPathResource resource = new ClassPathResource("words.txt");
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                for (String word : line.split(",")) {
+                    String cleaned = word.trim().toLowerCase();
+                    if (!cleaned.isEmpty()) {
+                        words.add(cleaned);
+                    }
                 }
             }
+            System.out.println(">>> WordService: caricate " + words.size() + " parole da words.txt");
         } catch (Exception e) {
+            System.err.println(">>> ERRORE lettura words.txt: " + e.getMessage());
+        }
+
+        if (words.isEmpty()) {
             words.add("disegno");
         }
     }
 
     @Override
     public String getRandomWord() {
-        if (words.isEmpty()) {
-            return "disegno";
-        }
-        return words.get(random.nextInt(words.size()));
+        return words.get(ThreadLocalRandom.current().nextInt(words.size()));
     }
+
+    @Override
+    public List<String> getRandomWords(int count) {
+        if (words.size() <= count) {
+            return new ArrayList<>(words);
+        }
+        List<String> copy = new ArrayList<>(words);
+        java.util.Collections.shuffle(copy, ThreadLocalRandom.current());
+        return copy.subList(0, count);
+    }
+
+
+
 }

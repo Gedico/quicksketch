@@ -1,1 +1,0 @@
-albero,casa,sole,macchina,gatto,cane,fiore,luna,pallone,chitarra,tavolo,sedia,orologio,computer,libro
