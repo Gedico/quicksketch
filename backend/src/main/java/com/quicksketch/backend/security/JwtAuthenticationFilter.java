@@ -1,59 +1,59 @@
-package com.quicksketch.backend.security;
+    package com.quicksketch.backend.security;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+    import jakarta.servlet.FilterChain;
+    import jakarta.servlet.ServletException;
+    import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.servlet.http.HttpServletResponse;
+    import org.springframework.lang.NonNull;
+    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+    import org.springframework.stereotype.Component;
+    import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.List;
+    import java.io.IOException;
+    import java.util.List;
 
-@Component
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    @Component
+    public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtils jwtUtils;
+        private final JwtUtils jwtUtils;
 
-    public JwtAuthenticationFilter(JwtUtils jwtUtils) {
-        this.jwtUtils = jwtUtils;
-    }
-
-    @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                    @NonNull HttpServletResponse response,
-                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
-        try {
-            // Estraiamo il JWT dal cookie anziché dall'header Authorization
-            String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                String username = jwtUtils.getUsernameFromJwtToken(jwt);
-
-                // Assegniamo l'autorità ROLE_USER per farlo riconoscere come utente autenticato
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-                        );
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
-            logger.error("Impossibile impostare l'autenticazione utente: {}", e);
+        public JwtAuthenticationFilter(JwtUtils jwtUtils) {
+            this.jwtUtils = jwtUtils;
         }
 
-        filterChain.doFilter(request, response);
-    }
+        @Override
+        protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                        @NonNull HttpServletResponse response,
+                                        @NonNull FilterChain filterChain) throws ServletException, IOException {
+            try {
+                // Estraiamo il JWT dal cookie anziché dall'header Authorization
+                String jwt = parseJwt(request);
+                if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+                    String username = jwtUtils.getUsernameFromJwtToken(jwt);
 
-    private String parseJwt(HttpServletRequest request) {
-        // Legge il cookie HttpOnly tramite JwtUtils
-        return jwtUtils.getJwtFromCookies(request);
+                    // Assegniamo l'autorità ROLE_USER per farlo riconoscere come utente autenticato
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                            );
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (Exception e) {
+                logger.error("Impossibile impostare l'autenticazione utente: {}", e);
+            }
+
+            filterChain.doFilter(request, response);
+        }
+
+        private String parseJwt(HttpServletRequest request) {
+            // Legge il cookie HttpOnly tramite JwtUtils
+            return jwtUtils.getJwtFromCookies(request);
+        }
     }
-}

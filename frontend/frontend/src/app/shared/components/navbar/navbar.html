@@ -1,58 +1,43 @@
 <nav class="navbar">
-  <div class="nav-brand">
-  <a routerLink="/" (click)="closeDropdown()">🎨 Quick<span class="logo-accent">Sketch</span></a>
-</div>
+  <div class="navbar-brand">
+    <a routerLink="/" class="brand-logo">
+      Quick<span>Sketch</span>
+    </a>
+  </div>
 
-  <div class="nav-right">
-    <!-- Trigger Menu Profilo / Utente -->
-    <div class="user-menu-container">
-      <button class="profile-btn" (click)="toggleDropdown()">
-        <span class="avatar-icon">👤</span>
-        <span class="user-label" *ngIf="authService.isLoggedIn()">Profilo</span>
-        <span class="user-label" *ngIf="!authService.isLoggedIn()">Account</span>
-        <span class="arrow" [class.open]="isDropdownOpen">▼</span>
+  <div class="navbar-links">
+    <!-- Link sempre visibili a tutti -->
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+      Home
+    </a>
+
+    <a routerLink="/leaderboard" routerLinkActive="active" class="nav-link">
+      Classifica
+    </a>
+
+    <!-- Link riservati agli utenti autenticati -->
+    <ng-container *ngIf="authService.isAuthenticatedSignal(); else guestLinks">
+      <a routerLink="/create" routerLinkActive="active" class="nav-link">
+        Crea Sketch
+      </a>
+
+      <a routerLink="/profile" routerLinkActive="active" class="nav-link">
+        Statistiche
+      </a>
+
+      <button type="button" (click)="onLogout()" class="btn-logout">
+        Esci
       </button>
+    </ng-container>
 
-      <!-- Dropdown Menu a Tendina -->
-      <div class="dropdown-menu" *ngIf="isDropdownOpen">
-        
-        <!-- OPZIONI QUANDO L'UTENTE È AUTENTICATO -->
-        <ng-container *ngIf="authService.isLoggedIn()">
-          <div class="dropdown-header">
-            <p class="status-title">Connesso</p>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/create" class="dropdown-item" (click)="closeDropdown()">
-              Crea Sketch
-          </a>
-          <a routerLink="/gallery" (click)="closeDropdown()" class="dropdown-item">
-            🖼️ Galleria Sketch
-          </a>
-          <a routerLink="/profile" (click)="closeDropdown()" class="dropdown-item">
-            ⚙️ Impostazioni
-          </a>
-          <div class="dropdown-divider"></div>
-          <button (click)="onLogout()" class="dropdown-item logout-item">
-            🚪 Logout
-          </button>
-        </ng-container>
-
-        <!-- OPZIONI QUANDO L'UTENTE NON È AUTENTICATO -->
-        <ng-container *ngIf="!authService.isLoggedIn()">
-          <div class="dropdown-header">
-            <p class="status-title">Benvenuto!</p>
-            <p class="status-sub">Accedi o registrati per giocare</p>
-          </div>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/login" (click)="closeDropdown()" class="dropdown-item font-bold">
-            🔑 Accedi
-          </a>
-          <a routerLink="/register" (click)="closeDropdown()" class="dropdown-item highlight-item">
-            ✨ Crea Account
-          </a>
-        </ng-container>
-
-      </div>
-    </div>
+    <!-- Link per utenti non autenticati -->
+    <ng-template #guestLinks>
+      <a routerLink="/login" routerLinkActive="active" class="nav-link">
+        Accedi
+      </a>
+      <a routerLink="/register" routerLinkActive="active" class="btn-register">
+        Registrati
+      </a>
+    </ng-template>
   </div>
 </nav>

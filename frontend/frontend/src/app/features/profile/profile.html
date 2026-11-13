@@ -1,0 +1,94 @@
+<div class="profile-container">
+  <div *ngIf="isLoading" class="status-box">
+    Caricamento statistiche personali...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-box">
+    <p>{{ errorMessage }}</p>
+    <a routerLink="/login" class="btn-primary">Vai al Login</a>
+  </div>
+
+  <div *ngIf="stats && !isLoading" class="profile-content">
+    <!-- Intestazione Profilo -->
+    <div class="profile-banner">
+      <div class="avatar-circle">
+        {{ stats.username.charAt(0) | uppercase }}
+      </div>
+      <div class="user-meta">
+        <h1>{{ stats.username }}</h1>
+        <p class="email">{{ stats.email }}</p>
+        <p class="joined">Membro dal {{ stats.createdAt | date:'dd/MM/yyyy' }}</p>
+      </div>
+      <div class="elo-summary">
+        <div class="elo-pill">
+          <span class="elo-label">Guesser Elo</span>
+          <span class="elo-val">{{ stats.guesserElo }}</span>
+          <span class="elo-rank">#{{ stats.guesserRank }} in classifica</span>
+        </div>
+        <div class="elo-pill">
+          <span class="elo-label">Sketcher Elo</span>
+          <span class="elo-val">{{ stats.sketcherElo }}</span>
+          <span class="elo-rank">#{{ stats.sketcherRank }} in classifica</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sezione 1: Statistiche Indovinatore (Guesser) -->
+    <section class="stats-section">
+      <h2>Le tue prestazioni come Guesser</h2>
+      <div class="stats-grid">
+        <div class="stat-card accent-green">
+          <span class="stat-value">{{ stats.wordsGuessed }}</span>
+          <span class="stat-title">Parole Indovinate</span>
+        </div>
+
+        <div class="stat-card accent-red">
+          <span class="stat-value">{{ stats.wordsFailed }}</span>
+          <span class="stat-title">Parole Non Indovinate</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ stats.totalGuessAttemptsUsed }}</span>
+          <span class="stat-title">Tentativi Totali Utilizzati</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ stats.winRatePercentage }}%</span>
+          <span class="stat-title">Percentuale Vittorie</span>
+          <span class="stat-sub">Media {{ stats.averageAttemptsPerGame }} tentativi/partita</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sezione 2: Statistiche Disegnatore (Sketcher) -->
+    <section class="stats-section">
+      <h2>Le tue prestazioni come Sketcher</h2>
+      <div class="stats-grid">
+        <div class="stat-card accent-yellow">
+          <span class="stat-value">{{ stats.sketchesCreated }}</span>
+          <span class="stat-title">Disegni Prodotti</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ stats.sketchesGuessedByOthers }}</span>
+          <span class="stat-title">Indovinati dagli Altri</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ stats.sketchesPlayedByOthers }}</span>
+          <span class="stat-title">Partite Giocate sui tuoi Sketch</span>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-value">{{ stats.sketchGuessedPercentage }}%</span>
+          <span class="stat-title">Tasso di Comprensione</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions-footer">
+      <a routerLink="/leaderboard" class="btn-secondary">Vedi Classifica Globale</a>
+      <a routerLink="/create" class="btn-primary">+ Crea Nuovo Sketch</a>
+    </div>
+  </div>
+</div>

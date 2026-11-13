@@ -1,0 +1,114 @@
+<div class="leaderboard-container">
+  <div class="leaderboard-header">
+    <h1>Classifica Globale</h1>
+    <p class="subtitle">
+      Scopri i migliori giocatori della community ordinati tramite rating Elo pesato.
+    </p>
+  </div>
+
+  <!-- Switch tra le due classifiche -->
+  <div class="tabs-bar">
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'guessers'"
+      (click)="selectTab('guessers')"
+    >
+      Migliori Guessers (Indovinatori)
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      [class.active]="activeTab === 'sketchers'"
+      (click)="selectTab('sketchers')"
+    >
+      Migliori Sketchers (Disegnatori)
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="status-box">
+    Caricamento classifica in corso...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-box">
+    {{ errorMessage }}
+  </div>
+
+  <!-- TAB 1: TOP GUESSERS -->
+  <div *ngIf="!isLoading && !errorMessage && activeTab === 'guessers'" class="table-card">
+    <p class="formula-note">
+      Ordinati per <strong>Guesser Elo</strong> (bilancia parole indovinate, tasso di vittoria e tentativi risparmiati).
+    </p>
+
+    <div *ngIf="topGuessers.length === 0" class="empty-msg">
+      Nessun giocatore ancora registrato.
+    </div>
+
+    <div class="table-responsive" *ngIf="topGuessers.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Giocatore</th>
+            <th>Guesser Elo</th>
+            <th>Parole Indovinate</th>
+            <th>Non Indovinate</th>
+            <th>Tentativi Usati</th>
+            <th>Win Rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of topGuessers" [class.top-three]="g.rank <= 3">
+            <td class="rank-cell">
+              <span class="rank-badge" [ngClass]="'rank-' + g.rank">{{ g.rank }}</span>
+            </td>
+            <td class="username-cell">{{ g.username }}</td>
+            <td class="elo-cell">{{ g.guesserElo }}</td>
+            <td class="highlight-green">{{ g.wordsGuessed }}</td>
+            <td>{{ g.wordsFailed }}</td>
+            <td>{{ g.totalGuessAttemptsUsed }}</td>
+            <td>{{ g.winRatePercentage }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 2: TOP SKETCHERS -->
+  <div *ngIf="!isLoading && !errorMessage && activeTab === 'sketchers'" class="table-card">
+    <p class="formula-note">
+      Ordinati per <strong>Sketcher Elo</strong> (pesa la percentuale di sketch indovinati dagli altri rispetto al numero di partite).
+    </p>
+
+    <div *ngIf="topSketchers.length === 0" class="empty-msg">
+      Nessun disegnatore ancora registrato.
+    </div>
+
+    <div class="table-responsive" *ngIf="topSketchers.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Disegnatore</th>
+            <th>Sketcher Elo</th>
+            <th>% Sketch Indovinati</th>
+            <th>Indovinati / Giocati</th>
+            <th>Sketch Creati</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of topSketchers" [class.top-three]="s.rank <= 3">
+            <td class="rank-cell">
+              <span class="rank-badge" [ngClass]="'rank-' + s.rank">{{ s.rank }}</span>
+            </td>
+            <td class="username-cell">{{ s.username }}</td>
+            <td class="elo-cell">{{ s.sketcherElo }}</td>
+            <td class="highlight-yellow">{{ s.guessedPercentage }}%</td>
+            <td>{{ s.sketchesGuessedByOthers }} / {{ s.sketchesPlayedByOthers }}</td>
+            <td>{{ s.sketchesCreated }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

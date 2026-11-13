@@ -1,150 +1,79 @@
-$bg-navbar: #181818;
-$border-color: #2a2a2a;
-$text-light: #ffffff;
-$text-muted: #888888;
-$accent-yellow: #ffee00;
-$accent-yellow-hover: #e6d700;
-
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.8rem 2rem;
-  background-color: $bg-navbar;
-  border-bottom: 2px solid $accent-yellow; // Riga di nagivazione evidenziata col giallo
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-
-  .nav-brand a {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: $text-light;
-    text-decoration: none;
-    letter-spacing: -0.5px;
-
-    span.logo-accent {
-      color: $accent-yellow;
-    }
-  }
-
-  .user-menu-container {
-    position: relative;
-
-    .profile-btn {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      background: #242424;
-      border: 1px solid #3a3a3a;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: 600;
-      color: $text-light;
-      transition: all 0.2s ease;
-
-      &:hover {
-        border-color: $accent-yellow;
-        color: $accent-yellow;
-      }
-
-      .avatar-icon {
-        font-size: 1.1rem;
-      }
-
-      .arrow {
-        font-size: 0.65rem;
-        transition: transform 0.2s ease;
-        &.open {
-          transform: rotate(180deg);
-        }
-      }
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      right: 0;
-      top: calc(100% + 10px);
-      width: 220px;
-      background: #202020;
-      border: 1px solid #333333;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
-      padding: 0.5rem 0;
-      z-index: 1000;
-      animation: fadeIn 0.15s ease-out;
-
-      .dropdown-header {
-        padding: 0.6rem 1rem;
-        
-        .status-title {
-          margin: 0;
-          font-weight: 700;
-          font-size: 0.95rem;
-          color: $text-light;
-        }
-
-        .status-sub {
-          margin: 0.2rem 0 0 0;
-          font-size: 0.8rem;
-          color: $text-muted;
-        }
-      }
-
-      .dropdown-divider {
-        height: 1px;
-        background-color: #333333;
-        margin: 0.4rem 0;
-      }
-
-      .dropdown-item {
-        display: block;
-        width: 100%;
-        padding: 0.6rem 1rem;
-        clear: both;
-        font-weight: 500;
-        color: #cccccc;
-        text-align: inherit;
-        text-decoration: none;
-        white-space: nowrap;
-        background-color: transparent;
-        border: 0;
-        cursor: pointer;
-        font-size: 0.9rem;
-        box-sizing: border-box;
-
-        &:hover {
-          background-color: #2c2c2c;
-          color: $accent-yellow;
-        }
-
-        &.logout-item {
-          color: #ff5555;
-          &:hover {
-            background-color: rgba(255, 85, 85, 0.1);
-          }
-        }
-
-        &.highlight-item {
-          color: $accent-yellow;
-          font-weight: 700;
-        }
-
-        &.font-bold {
-          font-weight: 600;
-          color: $text-light;
-        }
-      }
-    }
-  }
+  background-color: #181818;
+  border-bottom: 1px solid #2c2c2c;
+  padding: 0.9rem 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.brand-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+}
+
+.brand-logo span {
+  color: #ffee00;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  color: #d4d4d4;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #ffffff;
+}
+
+.nav-link.active {
+  color: #ffee00;
+  border-bottom-color: #ffee00;
+}
+
+.btn-register {
+  background-color: #ffee00;
+  color: #121212;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.92rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: opacity 0.2s ease;
+}
+
+.btn-register:hover {
+  opacity: 0.9;
+}
+
+.btn-logout {
+  background-color: transparent;
+  color: #ff6b6b;
+  border: 1px solid #ff5252;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: rgba(255, 82, 82, 0.14);
 }
