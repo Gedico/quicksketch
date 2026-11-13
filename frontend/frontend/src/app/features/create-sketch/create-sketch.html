@@ -71,10 +71,17 @@
         (mousedown)="startDrawing($event)"
         (mousemove)="draw($event)"
         (mouseup)="stopDrawing()"
-        (mouseleave)="stopDrawing()">
+        (mouseleave)="stopDrawing()"
+        (touchstart)="startDrawing($event)"
+        (touchmove)="draw($event)"
+        (touchend)="stopDrawing()">
       </canvas>
     </div>
 
+    <div *ngIf="errorMessage && sessionState === 'DRAWING'" class="alert-error" style="margin-top: 1rem; width: 100%; box-sizing: border-box;">
+      {{ errorMessage }}
+    </div>
+    
     <div class="workspace-footer">
       <button
         type="button"

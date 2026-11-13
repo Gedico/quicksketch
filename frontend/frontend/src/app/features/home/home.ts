@@ -68,4 +68,11 @@ export class HomeComponent {
       }
     });
   }
+
+  scrollToGallery(): void {
+    const galleryEl = document.getElementById('gallery-section');
+    if (galleryEl) {
+      galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }

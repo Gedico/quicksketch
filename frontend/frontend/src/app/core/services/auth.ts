@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { LoginRequestDto, RegisterRequestDto } from '../dto/auth';
 
 @Injectable({
@@ -17,10 +17,22 @@ export class AuthService {
   }
 
   checkSession(): void {
-    this.http.get(`${this.apiUrl}/me`, { withCredentials: true }).subscribe({
-      next: () => this.isAuthenticatedSignal.set(true),
-      error: () => this.isAuthenticatedSignal.set(false)
-    });
+    this.ensureAuthenticated().subscribe();
+  }
+
+  ensureAuthenticated(): Observable<boolean> {
+    if (this.isAuthenticatedSignal()) {
+      return of(true);
+    }
+
+    return this.http.get(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      tap(() => this.isAuthenticatedSignal.set(true)),
+      map(() => true),
+      catchError(() => {
+        this.isAuthenticatedSignal.set(false);
+        return of(false);
+      })
+    );
   }
 
   register(request: RegisterRequestDto): Observable<any> {

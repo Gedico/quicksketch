@@ -1,21 +1,20 @@
 // ==========================================
-// QUICKSKETCH THEME VARIABLES
+// QUICKSKETCH THEME VARIABLES (Midnight Navy & Sky Blue)
 // ==========================================
-$bg-dark: #121212;
-$bg-card: #1e1e1e;
-$border-color: #333333;
+$bg-dark: #0b1120;
+$bg-card: #131c31;
+$border-color: #23314d;
 
-$text-light: #f8f9fa;
-$text-muted: #a0a0a0;
+$text-light: #f1f5f9;
+$text-muted: #94a3b8;
 
-// Accento principale (Giallo Acceso)
-$accent-yellow: #ffee00;
-$accent-yellow-hover: #e6d700;
+// Accento principale (Azzurro brillante)
+$accent-yellow: #38bdf8;
+$accent-yellow-hover: #7dd3fc;
 
 // Danger / Alert
-$danger-red: #ff4d4d;
+$danger-red: #ef4444;
 
-// Reset base
 html, body {
   margin: 0;
   padding: 0;

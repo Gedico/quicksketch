@@ -1,60 +1,94 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>Crea un Account</h2>
-    <p class="auth-subtitle">Unisciti a Quick<span class="accent">Sketch</span></p>
+<div class="auth-page">
+  <div class="auth-layout">
+    <!-- COLONNA SINISTRA: VANTAGGI DELL'ISCRIZIONE -->
+    <section class="auth-showcase">
+      <span class="badge-sky">Nuovo Profilo Giocatore</span>
+      <h1>Entra su Quick<span>Sketch</span></h1>
+      <p class="lead">
+        Crea il tuo account gratuito per sbloccare la canvas di disegno, partecipare alle sfide a tentativi e salire nelle classifiche globali.
+      </p>
 
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <strong>Pubblica i tuoi Sketch</strong>
+          <span>Pesca una parola casuale, disegnala prima dello scadere del tempo e metti alla prova gli altri utenti.</span>
+        </div>
 
-    <div *ngIf="successMessage" class="alert alert-success">
-      {{ successMessage }}
-    </div>
+        <div class="feature-item">
+          <strong>Partite salvate in automatico</strong>
+          <span>Hai fino a 10 tentativi per ogni sketch: puoi interrompere una sfida e riprenderla quando vuoi dalla Home.</span>
+        </div>
 
-    <form (ngSubmit)="onRegister()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          [(ngModel)]="credentials.username"
-          placeholder="Inserisci il tuo username"
-          required
-        />
+        <div class="feature-item">
+          <strong>Profilo & Storico Personale</strong>
+          <span>Tieni traccia delle tue percentuali di vittoria, dei tentativi medi e del tuo posizionamento Elo.</span>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          [(ngModel)]="credentials.email"
-          placeholder="nome@esempio.com"
-          required
-        />
+      <div class="showcase-links">
+        <a routerLink="/" class="link-sky">← Esplora la Galleria Pubblica</a>
+        <a routerLink="/leaderboard" class="link-sky">Guarda i Migliori Giocatori →</a>
+      </div>
+    </section>
+
+    <!-- COLONNA DESTRA: FORM DI REGISTRAZIONE -->
+    <section class="auth-card">
+      <h2>Crea un Account</h2>
+      <p class="auth-subtitle">Compila i dati qui sotto per iniziare a giocare</p>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
       </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [(ngModel)]="credentials.password"
-          placeholder="••••••••"
-          required
-        />
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="isLoading">
-        {{ isLoading ? 'Registrazione in corso...' : 'Registrati' }}
-      </button>
-    </form>
+      <form (ngSubmit)="onRegister()">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="credentials.username"
+            placeholder="Scegli uno username"
+            required
+          />
+        </div>
 
-    <div class="auth-footer">
-      <p>Hai già un account? <a routerLink="/login">Accedi qui</a></p>
-    </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="credentials.email"
+            placeholder="nome@esempio.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          {{ isLoading ? 'Registrazione in corso...' : 'Registrati' }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Hai già un account? <a routerLink="/login">Accedi qui</a></p>
+      </div>
+    </section>
   </div>
 </div>

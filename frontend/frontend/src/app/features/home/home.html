@@ -1,87 +1,103 @@
 <div class="home-container">
-  <div class="home-header">
-    <div>
-      <h1>{{ authService.isAuthenticatedSignal() ? 'Sketch da Indovinare' : 'Galleria degli Sketch' }}</h1>
-      <p class="subtitle">
+  <!-- HERO BANNER CON ANTEPRIMA SKETCH IN EVIDENZA -->
+  <section class="hero-box">
+    <div class="hero-main">
+      <span class="badge-amber">Pictionary Web • Sfide a tempo</span>
+      <h1>Disegna al volo, metti alla prova il tuo intuito.</h1>
+      <p>
         {{ authService.isAuthenticatedSignal()
-          ? 'Metti alla prova il tuo colpo d’occhio sui disegni degli altri utenti (10 tentativi per sketch)'
-          : 'Esplora i disegni della community. Accedi per creare i tuoi sketch e indovinare quelli degli altri!' }}
+          ? 'Scegli una parola dal pool e disegnala prima che scada il tempo, oppure indovina gli sketch degli altri utenti in massimo 10 tentativi.'
+          : 'Esplora la galleria pubblica della community. Accedi per disegnare nuovi sketch, indovinare le parole nascoste e scalare le classifiche Elo.' }}
       </p>
+
+      <div class="hero-buttons">
+        <a routerLink="/create" class="btn-primary">+ Crea Sketch</a>
+        <button type="button" (click)="scrollToGallery()" class="btn-secondary">
+          {{ authService.isAuthenticatedSignal() ? 'Sketch da Indovinare' : 'Esplora Galleria' }}
+        </button>
+        <a routerLink="/leaderboard" class="btn-ghost">Classifica Elo →</a>
+      </div>
+
+      <div class="hero-stats">
+        <div><strong>{{ sketches.length }}</strong><span>Sketch disponibili</span></div>
+        <div><strong>10</strong><span>Tentativi max</span></div>
+        <div><strong>2</strong><span>Classifiche Elo</span></div>
+      </div>
     </div>
 
-    <a *ngIf="authService.isAuthenticatedSignal()" routerLink="/create" class="btn-create-sketch">
-      + Crea Sketch
-    </a>
-  </div>
+    <!-- Riutilizza direttamente .sketch-card per l'anteprima in evidenza -->
+    <article class="sketch-card spotlight" *ngIf="!isLoading && sketches.length > 0; else emptySpotlight">
+      <div class="canvas-preview">
+        <span class="floating-badge">In evidenza</span>
+        <img [src]="sketches[0].imageData" [alt]="'Ultimo sketch di ' + sketches[0].authorUsername" />
+      </div>
+      <div class="card-meta">
+        <span>di <strong>{{ sketches[0].authorUsername }}</strong></span>
+        <a [routerLink]="authService.isAuthenticatedSignal() ? ['/guess', sketches[0].id] : ['/login']" class="link-amber">
+          {{ authService.isAuthenticatedSignal() ? 'Indovina →' : 'Accedi →' }}
+        </a>
+      </div>
+    </article>
 
-  <div *ngIf="isLoading" class="status-box">
-    Caricamento sketch in corso...
-  </div>
+    <ng-template #emptySpotlight>
+      <div class="feedback-box">
+        <p>Nessuno sketch ancora in galleria.</p>
+        <a routerLink="/create" class="btn-primary">Disegna il primo</a>
+      </div>
+    </ng-template>
+  </section>
 
-  <div *ngIf="errorMessage" class="error-box">
-    {{ errorMessage }}
-  </div>
+  <div *ngIf="isLoading" class="feedback-box">Caricamento sketch in corso...</div>
+  <div *ngIf="errorMessage" class="feedback-box error">{{ errorMessage }}</div>
 
-  <!-- Sezione Partite in sospeso (visibile solo se loggato e se ci sono partite iniziate non finite) -->
-  <section *ngIf="!isLoading && authService.isAuthenticatedSignal() && inProgressGuesses.length > 0" class="in-progress-section">
-    <div class="section-title-row">
+  <!-- PARTITE IN SOSPESO -->
+  <section *ngIf="!isLoading && authService.isAuthenticatedSignal() && inProgressGuesses.length > 0" class="gallery-section">
+    <div class="section-head">
       <h2>Partite in sospeso ({{ inProgressGuesses.length }})</h2>
-      <span class="section-hint">Riprendi da dove avevi lasciato: i tentativi già usati restano salvati.</span>
+      <span>I tentativi già utilizzati restano salvati</span>
     </div>
 
     <div class="sketches-grid">
-      <div *ngFor="let item of inProgressGuesses" class="sketch-card in-progress-card">
-        <div class="badge-in-progress">
-          Tentativi: {{ item.attemptsUsed }} / {{ item.maxAttempts }}
+      <article *ngFor="let item of inProgressGuesses" class="sketch-card">
+        <div class="canvas-preview">
+          <span class="floating-badge">{{ item.attemptsUsed }}/{{ item.maxAttempts }} tentativi</span>
+          <img [src]="item.imageData" [alt]="'Sketch di ' + item.authorUsername" />
         </div>
-
-        <div class="image-wrapper">
-          <img [src]="item.imageData" [alt]="'Sketch in sospeso di ' + item.authorUsername" />
+        <div class="card-meta">
+          <span>di <strong>{{ item.authorUsername }}</strong></span>
+          <span>{{ item.startedAt | date:'dd/MM HH:mm' }}</span>
         </div>
-
-        <div class="card-footer">
-          <span class="author">Di <strong>{{ item.authorUsername }}</strong></span>
-          <span class="date">Iniziata: {{ item.startedAt | date:'dd/MM HH:mm' }}</span>
-        </div>
-
-        <div class="card-action">
-          <a [routerLink]="['/guess', item.sketchId]" class="btn-resume">
-            Riprendi partita
-          </a>
-        </div>
-      </div>
+        <a [routerLink]="['/guess', item.sketchId]" class="btn-outline card-btn">Riprendi partita</a>
+      </article>
     </div>
   </section>
 
-  <!-- Messaggio vuoto per gli sketch nuovi -->
-  <div *ngIf="!isLoading && !errorMessage && sketches.length === 0" class="status-box">
-    <ng-container *ngIf="authService.isAuthenticatedSignal(); else publicEmpty">
-      Non ci sono nuovi sketch da scoprire al momento!
-      <span *ngIf="inProgressGuesses.length > 0">Completa le tue partite in sospeso qui sopra oppure crea un nuovo disegno.</span>
-      <span *ngIf="inProgressGuesses.length === 0">Crea un nuovo disegno o torna più tardi.</span>
-    </ng-container>
-    <ng-template #publicEmpty>
-      Nessuno sketch ancora presente. Registrati o accedi per disegnarne uno!
-    </ng-template>
-  </div>
+  <!-- GALLERIA PRINCIPALE -->
+  <section id="gallery-section" class="gallery-section">
+    <div class="section-head">
+      <h2>{{ authService.isAuthenticatedSignal() ? 'Sketch da Indovinare' : 'Galleria degli Sketch' }}</h2>
+      <span *ngIf="!isLoading">{{ sketches.length }} disponibili</span>
+    </div>
 
-  <!-- Griglia nuovi sketch giocabili o galleria pubblica -->
-  <div *ngIf="!isLoading && sketches.length > 0" class="sketches-grid">
-    <div *ngFor="let sketch of sketches" class="sketch-card">
-      <div class="image-wrapper">
-        <img [src]="sketch.imageData" [alt]="'Sketch di ' + sketch.authorUsername" />
-      </div>
+    <div *ngIf="!isLoading && !errorMessage && sketches.length === 0" class="feedback-box">
+      {{ authService.isAuthenticatedSignal()
+        ? 'Nessun nuovo sketch disponibile al momento. Crea un disegno o torna più tardi!'
+        : 'Nessuno sketch ancora pubblicato. Accedi per creare il primo!' }}
+    </div>
 
-      <div class="card-footer">
-        <span class="author">Di <strong>{{ sketch.authorUsername }}</strong></span>
-        <span class="date">{{ sketch.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-
-      <div *ngIf="authService.isAuthenticatedSignal()" class="card-action">
-        <a [routerLink]="['/guess', sketch.id]" class="btn-guess">
+    <div *ngIf="!isLoading && sketches.length > 0" class="sketches-grid">
+      <article *ngFor="let sketch of sketches" class="sketch-card">
+        <div class="canvas-preview">
+          <img [src]="sketch.imageData" [alt]="'Sketch di ' + sketch.authorUsername" />
+        </div>
+        <div class="card-meta">
+          <span>di <strong>{{ sketch.authorUsername }}</strong></span>
+          <span>{{ sketch.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+        <a *ngIf="authService.isAuthenticatedSignal()" [routerLink]="['/guess', sketch.id]" class="btn-primary card-btn">
           Indovina parola
         </a>
-      </div>
+      </article>
     </div>
-  </div>
+  </section>
 </div>

@@ -1,8 +1,7 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -28,13 +27,29 @@ export class NavbarComponent {
     this.isDropdownOpen = false;
   }
 
-  onLogout(): void {
-    this.authService.logout();
+  goToGallery(): void {
     this.closeDropdown();
-    this.router.navigate(['/login']);
+    if (this.router.url.split('#')[0] === '/') {
+      document.getElementById('gallery-section')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      this.router.navigate(['/'], { fragment: 'gallery-section' });
+    }
   }
 
-  // Chiude il menu a tendina se si clicca in un punto qualsiasi fuori dal componente
+  onLogout(): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        this.closeDropdown();
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        this.authService.isAuthenticatedSignal.set(false);
+        this.closeDropdown();
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
   @HostListener('document:click', ['$event'])
   clickOut(event: Event): void {
     if (!this.eRef.nativeElement.contains(event.target)) {

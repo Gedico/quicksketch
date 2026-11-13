@@ -1,48 +1,82 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <h2>Accedi</h2>
-    <p class="auth-subtitle">Benvenuto su Quick<span class="accent">Sketch</span></p>
+<div class="auth-page">
+  <div class="auth-layout">
+    <!-- COLONNA SINISTRA: ESPERIENZA E FUNZIONALITÀ DELL'APP -->
+    <section class="auth-showcase">
+      <span class="badge-sky">Pictionary Web Arena</span>
+      <h1>Bentornato su Quick<span>Sketch</span></h1>
+      <p class="lead">
+        Accedi per impugnare il pennello, sfidare l’intuito della community e scalare entrambe le classifiche Elo.
+      </p>
 
-    <div *ngIf="errorMessage" class="alert alert-danger">
-      {{ errorMessage }}
-    </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <strong>Disegna contro il tempo</strong>
+          <span>Scegli una parola dal pool casuale e rappresentala sulla canvas prima dello scadere del timer.</span>
+        </div>
 
-    <div *ngIf="successMessage" class="alert alert-success">
-      {{ successMessage }}
-    </div>
+        <div class="feature-item">
+          <strong>Indovina in massimo 10 tentativi</strong>
+          <span>Analizza gli sketch degli altri utenti: i tuoi tentativi vengono salvati anche se riprendi la partita più tardi.</span>
+        </div>
 
-    <form (ngSubmit)="onLogin()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          [(ngModel)]="credentials.username"
-          placeholder="Inserisci il tuo username"
-          required
-        />
+        <div class="feature-item">
+          <strong>Doppio Rating Elo & Statistiche</strong>
+          <span>Monitora il tuo storico partite e competi sia come miglior Disegnatore sia come miglior Indovinatore.</span>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [(ngModel)]="credentials.password"
-          placeholder="••••••••"
-          required
-        />
+      <div class="showcase-links">
+        <a routerLink="/" class="link-sky">← Torna alla Galleria Pubblica</a>
+        <a routerLink="/leaderboard" class="link-sky">Vedi Classifica Globale →</a>
+      </div>
+    </section>
+
+    <!-- COLONNA DESTRA: FORM DI ACCESSO -->
+    <section class="auth-card">
+      <h2>Accedi</h2>
+      <p class="auth-subtitle">Inserisci le tue credenziali per iniziare a giocare</p>
+
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        {{ errorMessage }}
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="isLoading">
-        {{ isLoading ? 'Accesso in corso...' : 'Accedi' }}
-      </button>
-    </form>
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
 
-    <div class="auth-footer">
-      <p>Non hai un account? <a routerLink="/register">Registrati qui</a></p>
-    </div>
+      <form (ngSubmit)="onLogin()">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="credentials.username"
+            placeholder="Inserisci il tuo username"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="isLoading">
+          {{ isLoading ? 'Accesso in corso...' : 'Accedi' }}
+        </button>
+      </form>
+
+      <div class="auth-footer">
+        <p>Non hai un account? <a routerLink="/register">Registrati qui</a></p>
+      </div>
+    </section>
   </div>
 </div>

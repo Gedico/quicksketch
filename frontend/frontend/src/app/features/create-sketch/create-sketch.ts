@@ -23,12 +23,14 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Timer 2 minuti (120 secondi)
   timeLeft: number = 120;
-  private timerInterval: any = null;
+  private timerInterval: ReturnType<typeof setInterval> | null = null;
 
   // Stato Canvas e Strumenti
   private ctx!: CanvasRenderingContext2D;
   private isDrawing: boolean = false;
-  isCanvasLocked: boolean = true; // Bloccato finché non si sceglie la parola
+  private isEmergencySaved: boolean = false;
+
+  isCanvasLocked: boolean = true;
   isSaving: boolean = false;
   isLoadingWords: boolean = false;
   errorMessage: string = '';
@@ -68,6 +70,22 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ctx.lineJoin = 'round';
   }
 
+  // Calcola le coordinate reali sul canvas (680x420) anche se ridimensionato via CSS
+  private getCanvasCoordinates(event: MouseEvent | TouchEvent): { x: number; y: number } {
+    const canvas = this.canvasRef.nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const clientX = event instanceof MouseEvent ? event.clientX : event.touches[0].clientX;
+    const clientY = event instanceof MouseEvent ? event.clientY : event.touches[0].clientY;
+
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY
+    };
+  }
+
   // FASE 1: Richiesta delle 3 parole al backend
   loadWordOptions(): void {
     this.isLoadingWords = true;
@@ -84,7 +102,7 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  // FASE 2: Scelta della parola -> Chiusura popup -> Avvio sessione sul backend e timer
+  // FASE 2: Scelta della parola -> Avvio sessione e timer
   selectWord(word: string): void {
     this.errorMessage = '';
     this.selectedWord = word;
@@ -94,6 +112,7 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sketchId = response.id;
         this.sessionState = 'DRAWING';
         this.isCanvasLocked = false;
+        this.isEmergencySaved = false;
         this.startTimer();
       },
       error: () => {
@@ -120,22 +139,26 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
-  // --- Logica Disegno sul Canvas ---
+  // --- Logica Disegno (Mouse + Touch) ---
 
-  startDrawing(event: MouseEvent): void {
+  startDrawing(event: MouseEvent | TouchEvent): void {
     if (this.isCanvasLocked || this.sessionState !== 'DRAWING' || !this.ctx) return;
+    if (event instanceof TouchEvent) event.preventDefault();
+
     this.isDrawing = true;
-    const { offsetX, offsetY } = event;
+    const { x, y } = this.getCanvasCoordinates(event);
     this.ctx.beginPath();
-    this.ctx.moveTo(offsetX, offsetY);
+    this.ctx.moveTo(x, y);
   }
 
-  draw(event: MouseEvent): void {
+  draw(event: MouseEvent | TouchEvent): void {
     if (!this.isDrawing || this.isCanvasLocked || !this.ctx) return;
-    const { offsetX, offsetY } = event;
+    if (event instanceof TouchEvent) event.preventDefault();
+
+    const { x, y } = this.getCanvasCoordinates(event);
     this.ctx.strokeStyle = this.isEraser ? '#ffffff' : this.currentColor;
     this.ctx.lineWidth = this.brushSize;
-    this.ctx.lineTo(offsetX, offsetY);
+    this.ctx.lineTo(x, y);
     this.ctx.stroke();
   }
 
@@ -161,7 +184,7 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  // FASE 3: Scadenza timer o click su "Finito" -> Salvataggio automatico e riepilogo
+  // FASE 3: Salvataggio e riepilogo
   finishAndSaveSketch(): void {
     if (this.isCanvasLocked || this.isSaving || this.sessionState !== 'DRAWING') return;
 
@@ -169,6 +192,7 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isDrawing = false;
     this.clearTimer();
     this.isSaving = true;
+    this.errorMessage = '';
 
     const imageData = this.canvasRef.nativeElement.toDataURL('image/png');
     this.savedImagePreview = imageData;
@@ -180,12 +204,12 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: () => {
         this.isSaving = false;
-        this.errorMessage = 'Errore durante il salvataggio dello sketch.';
+        this.isCanvasLocked = false; // Sblocca per consentire un nuovo tentativo
+        this.errorMessage = 'Errore durante il salvataggio dello sketch. Riprova.';
       }
     });
   }
 
-  // Azione dal riepilogo finale: "Crea un nuovo sketch"
   startNewSketch(): void {
     this.clearTimer();
     this.selectedWord = '';
@@ -198,7 +222,6 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.brushSize = 4;
     this.sessionState = 'SELECTING_WORD';
 
-    // Pulisce la tela sullo sfondo e carica 3 nuove parole
     this.initCanvas();
     this.loadWordOptions();
   }
@@ -207,10 +230,10 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
-  // Salvataggio d'emergenza se l'utente chiude o aggiorna la pagina mentre disegna
   @HostListener('window:beforeunload')
   onBeforeUnload(): void {
     if (this.sessionState === 'DRAWING' && !this.isCanvasLocked && this.sketchId && this.canvasRef) {
+      this.isEmergencySaved = true;
       const imageData = this.canvasRef.nativeElement.toDataURL('image/png');
       fetch(`http://localhost:8080/api/sketches/${this.sketchId}/complete`, {
         method: 'PUT',
@@ -230,7 +253,7 @@ export class CreateSketchComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.sessionState === 'DRAWING' && !this.isCanvasLocked && this.sketchId && this.canvasRef) {
+    if (!this.isEmergencySaved && this.sessionState === 'DRAWING' && !this.isCanvasLocked && this.sketchId && this.canvasRef) {
       this.finishAndSaveSketch();
     }
     this.clearTimer();

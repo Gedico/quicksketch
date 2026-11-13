@@ -1,79 +1,145 @@
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #181818;
-  border-bottom: 1px solid #2c2c2c;
-  padding: 0.9rem 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  background-color: #38bdf8;
+  border-bottom: 2px solid #0284c7;
+  padding: 0.75rem 2rem;
 }
 
 .brand-logo {
   font-size: 1.5rem;
-  font-weight: 800;
-  color: #ffffff;
+  font-weight: 900;
+  color: #0b1120;
   text-decoration: none;
   letter-spacing: -0.5px;
+
+  span {
+    background-color: #0b1120;
+    color: #ffffff;
+    padding: 0.1rem 0.45rem;
+    border-radius: 6px;
+    margin-left: 2px;
+  }
 }
 
-.brand-logo span {
-  color: #ffee00;
+.dropdown-wrapper {
+  position: relative;
 }
 
-.navbar-links {
+.menu-trigger {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.nav-link {
-  color: #d4d4d4;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  padding: 0.35rem 0.5rem;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.nav-link:hover {
-  color: #ffffff;
-}
-
-.nav-link.active {
-  color: #ffee00;
-  border-bottom-color: #ffee00;
-}
-
-.btn-register {
-  background-color: #ffee00;
-  color: #121212;
-  text-decoration: none;
-  font-weight: 700;
+  gap: 0.55rem;
+  background-color: #0b1120;
+  color: #f1f5f9;
+  border: 1.5px solid #0b1120;
+  border-radius: 9px;
+  padding: 0.52rem 1rem;
+  font-family: inherit;
   font-size: 0.92rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  transition: opacity 0.2s ease;
-}
-
-.btn-register:hover {
-  opacity: 0.9;
-}
-
-.btn-logout {
-  background-color: transparent;
-  color: #ff6b6b;
-  border: 1px solid #ff5252;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    background-color: #131c31;
+    transform: translateY(-1px);
+  }
 }
 
-.btn-logout:hover {
-  background-color: rgba(255, 82, 82, 0.14);
+.burger-icon {
+  color: #7dd3fc;
+  font-size: 1rem;
+}
+
+.chevron {
+  color: #7dd3fc;
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+
+  &.open {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.55rem);
+  min-width: 215px;
+  background-color: #131c31;
+  border: 1px solid #23314d;
+  border-radius: 12px;
+  padding: 0.45rem;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.62rem 0.85rem;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+
+  &:hover,
+  &.active {
+    background-color: #1e293b;
+    color: #7dd3fc;
+  }
+}
+
+.highlight-item {
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.register-item {
+  background-color: #38bdf8;
+  color: #0b1120;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 0.2rem;
+
+  &:hover {
+    background-color: #7dd3fc;
+    color: #0b1120;
+  }
+}
+
+.danger-item {
+  color: #f87171;
+
+  &:hover {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+  }
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #23314d;
+  margin: 0.3rem 0.4rem;
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.7rem 1rem;
+  }
 }

@@ -1,43 +1,79 @@
 <nav class="navbar">
-  <div class="navbar-brand">
-    <a routerLink="/" class="brand-logo">
-      Quick<span>Sketch</span>
-    </a>
-  </div>
+  <a routerLink="/" (click)="closeDropdown()" class="brand-logo">
+    Quick<span>Sketch</span>
+  </a>
 
-  <div class="navbar-links">
-    <!-- Link sempre visibili a tutti -->
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-      Home
-    </a>
+  <div class="dropdown-wrapper">
+    <button
+      type="button"
+      class="menu-trigger"
+      (click)="toggleDropdown()"
+      [attr.aria-expanded]="isDropdownOpen"
+      aria-label="Apri menu di navigazione">
+      <span class="burger-icon">☰</span>
+      <span>{{ authService.isAuthenticatedSignal() ? 'Account' : 'Menu' }}</span>
+      <span class="chevron" [class.open]="isDropdownOpen">▾</span>
+    </button>
 
-    <a routerLink="/leaderboard" routerLinkActive="active" class="nav-link">
-      Classifica
-    </a>
-
-    <!-- Link riservati agli utenti autenticati -->
-    <ng-container *ngIf="authService.isAuthenticatedSignal(); else guestLinks">
-      <a routerLink="/create" routerLinkActive="active" class="nav-link">
-        Crea Sketch
+    <div class="dropdown-menu" *ngIf="isDropdownOpen">
+      <!-- Voci comuni a tutti -->
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeDropdown()"
+        class="dropdown-item">
+        Home
       </a>
 
-      <a routerLink="/profile" routerLinkActive="active" class="nav-link">
+      <button type="button" (click)="goToGallery()" class="dropdown-item">
+        Galleria Sketch
+      </button>
+
+      <!-- Voce extra solo se loggato -->
+      <a
+        *ngIf="authService.isAuthenticatedSignal()"
+        routerLink="/create"
+        routerLinkActive="active"
+        (click)="closeDropdown()"
+        class="dropdown-item highlight-item">
+        + Crea Sketch
+      </a>
+
+      <a
+        routerLink="/leaderboard"
+        routerLinkActive="active"
+        (click)="closeDropdown()"
+        class="dropdown-item">
+        Classifiche
+      </a>
+
+      <a
+        *ngIf="authService.isAuthenticatedSignal()"
+        routerLink="/profile"
+        routerLinkActive="active"
+        (click)="closeDropdown()"
+        class="dropdown-item">
         Statistiche
       </a>
 
-      <button type="button" (click)="onLogout()" class="btn-logout">
-        Esci
-      </button>
-    </ng-container>
+      <div class="dropdown-divider"></div>
 
-    <!-- Link per utenti non autenticati -->
-    <ng-template #guestLinks>
-      <a routerLink="/login" routerLinkActive="active" class="nav-link">
-        Accedi
-      </a>
-      <a routerLink="/register" routerLinkActive="active" class="btn-register">
-        Registrati
-      </a>
-    </ng-template>
+      <!-- Azioni finale in base allo stato -->
+      <ng-container *ngIf="authService.isAuthenticatedSignal(); else guestActions">
+        <button type="button" (click)="onLogout()" class="dropdown-item danger-item">
+          Esci
+        </button>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <a routerLink="/login" routerLinkActive="active" (click)="closeDropdown()" class="dropdown-item">
+          Accedi
+        </a>
+        <a routerLink="/register" routerLinkActive="active" (click)="closeDropdown()" class="dropdown-item register-item">
+          Registrati
+        </a>
+      </ng-template>
+    </div>
   </div>
 </nav>
