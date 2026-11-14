@@ -67,6 +67,9 @@
             placeholder="nome@esempio.com"
             required
           />
+          <small class="field-hint" *ngIf="credentials.email && !isEmailValid()">
+            L'email deve contenere "&#64;" e un dominio valido (es. .it, .com).
+          </small>
         </div>
 
         <div class="form-group">
@@ -76,9 +79,31 @@
             id="password"
             name="password"
             [(ngModel)]="credentials.password"
-            placeholder="••••••••"
+            placeholder="Min. 8 caratteri, 1 maiuscola, 1 numero"
             required
           />
+          <small class="field-hint" [class.valid]="isPasswordStrong()" *ngIf="credentials.password">
+            {{ isPasswordStrong()
+              ? '✓ Requisiti password rispettati'
+              : 'Serve almeno 8 caratteri, 1 lettera maiuscola e 1 numero.' }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Conferma Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            placeholder="Ripeti la password"
+            required
+          />
+          <small class="field-hint" [class.valid]="doPasswordsMatch()" *ngIf="confirmPassword">
+            {{ doPasswordsMatch()
+              ? '✓ Le password coincidono'
+              : 'Le password non coincidono ancora.' }}
+          </small>
         </div>
 
         <button type="submit" class="btn-submit" [disabled]="isLoading">

@@ -1,0 +1,68 @@
+---
+
+### File 2: `docs/PROJECT_ROADMAP_AND_NOTES.md`
+Salva questo secondo file sempre in `docs/` come guida di ripasso rapido per febbraio 2027:
+
+```markdown
+# QuickSketch — Riepilogo Tecnico e Guida di Ripasso (Consegna Febbraio 2027)
+
+Questo documento riassume l'architettura, le scelte progettuali e lo stato di avanzamento di **QuickSketch**, pensato come mappa rapida per riprendere il progetto prima della consegna e della presentazione orale.
+
+---
+
+## 1. Panoramica del Progetto
+
+**QuickSketch** è una web application multiplayer asincrona di disegno e deduzione:
+1. **Fase Sketcher (Disegnatore):** L'utente riceve 3 parole casuali dal dizionario (`words.txt`), ne sceglie una e ha **2 minuti** per disegnarla su un canvas HTML5 con strumenti di disegno personalizzabili. Al termine, il disegno viene salvato in formato Base64.
+2. **Fase Guesser (Indovinatore):** Gli altri giocatori visualizzano la galleria degli sketch giocabili (escludendo i propri e quelli già giocati) e hanno **10 tentativi** (oppure l'opzione di resa) per indovinare la parola segreta.
+3. **Classifiche ed Elo:** Ogni partita aggiorna le statistiche personali e due punteggi Elo separati (**Sketcher Elo** e **Guesser Elo**) calcolati tramite media bayesiana.
+
+---
+
+## 2. Stack Tecnologico
+
+* **Frontend:** Angular (Standalone Components, TypeScript, SCSS) con palette cromatica **"Midnight Blue"** (toni blu notte, azzurro elettrico e superfici scure ad alto contrasto).
+* **Backend:** Java 17 + Spring Boot (Spring Web, Spring Security, Spring Data, Jakarta Validation).
+* **Autenticazione:** Stateless tramite **JWT** salvato in cookie `HttpOnly` (`JwtUtils`), gestito con login, registrazione e logout con pulizia del cookie.
+* **Persistenza:** Repository Spring Data per `User`, `Sketch` e `Guess`.
+
+---
+
+## 3. Cosa è stato costruito e rifinito fino ad ora
+
+### Frontend (Angular)
+* **Tema UI/UX ("Midnight Blue"):** Migrazione completa e uniforme delle schermate di Autenticazione (`LoginComponent`, `RegisterComponent`), Creazione Sketch (`CreateSketchComponent`), Indovina Sketch (`GuessSketchComponent`), Galleria, Profilo e Classifiche.
+* **Validazione Form Speculare:** In `RegisterComponent` sono implementati controlli client-side per formato email (`@` e dominio), robustezza password (minimo 8 caratteri, 1 lettera maiuscola, 1 numero) e conferma password.
+* **Gestione Errori:** Tutti i componenti leggono `err.error?.message` allineandosi alle risposte JSON del backend.
+
+### Backend (Spring Boot)
+* **Flusso Creazione Sketch (`SketchServiceImpl`):**
+  1. `GET /api/sketches/word-options` $\rightarrow$ `WordServiceImpl` carica `words.txt` in `@PostConstruct` (deduplicato via `LinkedHashSet`) e restituisce 3 parole casuali via `ThreadLocalRandom`.
+  2. `POST /api/sketches/start` $\rightarrow$ crea lo sketch in stato non completato.
+  3. `PUT /api/sketches/{id}/complete` $\rightarrow$ salva l'`imageData` Base64, marca lo sketch come completato e incrementa `sketchesCreated` dell'autore.
+* **Flusso Partita Guess (`GuessServiceImpl`):**
+  * `POST /api/guesses/start/{sketchId}` $\rightarrow$ avvia o riprende una sessione `IN_PROGRESS`.
+  * `POST /api/guesses/{sketchId}/attempt` $\rightarrow$ normalizza l'input (`trim().toLowerCase()`), verifica vittoria, sconfitta al 10° tentativo o prosecuzione, aggiornando le statistiche di giocatore e autore.
+  * `POST /api/guesses/{sketchId}/surrender` $\rightarrow$ chiude la partita come persa e rivela la parola segreta.
+  * `GET /api/guesses/in-progress` $\rightarrow$ recupera le partite lasciate in sospeso dall'utente.
+* **Sistema di Ranking (`StatsServiceImpl`):**
+  * Calcolo separato per **Sketcher Elo** (basato su tasso di successo bayesiano degli sketch indovinati dagli altri + bonus attività fino a 150 pt) e **Guesser Elo** (win rate bayesiano + efficienza sui 10 tentativi + bonus vittorie).
+* **Pulizia Architetturale (Controller + Eccezioni):**
+  * Tutti i Controller (`AuthController`, `SketchController`, `GuessController`, `UserController`, `LeaderboardController`) sono stati ripuliti da blocchi `try/catch` ridondanti.
+  * Implementate **7 eccezioni personalizzate** organizzate in `exception/auth`, `exception/common` ed `exception/game`, gestite centralmente da `GlobalExceptionHandler` tramite il record `ErrorResponse`.
+
+---
+
+## 4. Checklist per la Ripresa (Febbraio 2027)
+
+Quando riprenderai in mano il progetto una settimana prima della consegna:
+
+1. **Test Suite (Prossimo step immediato):**
+   * Scrivere ed eseguire i **10 test** previsti (unit test su `AuthService`, `SketchServiceImpl`, `GuessServiceImpl`, `StatsServiceImpl` per verificare logica ed eccezioni custom + test di integrazione/E2E sui flussi principali).
+2. **Code Review & Pulizia:**
+   * Verificare che non ci siano `console.log` di debug dimenticati nei componenti Angular o `System.out.println` nel backend.
+   * Controllare i file di configurazione (`application.properties`, `environment.ts`) per verificare porte, URL API e parametri JWT.
+   * Aggiornare il `README.md` principale con istruzioni chiare su prerequisiti, avvio backend, avvio frontend e credenziali/utente demo.
+3. **Preparazione Presentazione:**
+   * Preparare 2 account di prova (es. `giocatore1` e `giocatore2`) per dimostrare dal vivo l'intero ciclo: registrazione $\rightarrow$ disegno di uno sketch con timer $\rightarrow$ cambio utente $\rightarrow$ tentativi di guess $\rightarrow$ aggiornamento classifiche Elo.
+   * Tenere a portata di mano `docs/EXCEPTIONS_ARCHITECTURE.md` per spiegare al docente la gestione centralizzata degli errori REST (`@RestControllerAdvice`) e la separazione tra Controller e Service.

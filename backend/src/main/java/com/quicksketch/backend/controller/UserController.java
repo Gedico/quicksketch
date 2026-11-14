@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -22,14 +20,10 @@ public class UserController {
     }
 
     @GetMapping("/me/stats")
-    public ResponseEntity<?> getMyStats(Authentication authentication) {
+    public ResponseEntity<UserProfileStatsResponse> getMyStats(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        try {
-            return ResponseEntity.ok(statsService.getPersonalStats(authentication.getName()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+        return ResponseEntity.ok(statsService.getPersonalStats(authentication.getName()));
     }
 }

@@ -193,3 +193,14 @@
 @media (max-width: 860px) {
   .auth-layout { grid-template-columns: 1fr; }
 }
+
+.field-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: #f87171;
+
+  &.valid {
+    color: #4ade80;
+  }
+}

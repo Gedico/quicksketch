@@ -3,14 +3,18 @@ package com.quicksketch.backend.service.impl;
 import com.quicksketch.backend.dto.sketch.CompleteSketchRequest;
 import com.quicksketch.backend.dto.sketch.SketchResponse;
 import com.quicksketch.backend.dto.sketch.StartSketchRequest;
+import com.quicksketch.backend.exception.common.ResourceNotFoundException;
+import com.quicksketch.backend.exception.common.UnauthorizedActionException;
+import com.quicksketch.backend.exception.game.GameRuleViolationException;
+import com.quicksketch.backend.exception.game.InvalidSketchDataException;
 import com.quicksketch.backend.mapper.SketchMapper;
 import com.quicksketch.backend.model.Guess;
 import com.quicksketch.backend.model.Sketch;
 import com.quicksketch.backend.repository.GuessRepository;
 import com.quicksketch.backend.repository.SketchRepository;
+import com.quicksketch.backend.repository.UserRepository;
 import com.quicksketch.backend.service.SketchService;
 import org.springframework.stereotype.Service;
-import com.quicksketch.backend.repository.UserRepository;
 
 import java.util.List;
 
@@ -34,6 +38,10 @@ public class SketchServiceImpl implements SketchService {
 
     @Override
     public SketchResponse startSketch(String authorUsername, StartSketchRequest request) {
+        if (request == null || request.getWord() == null || request.getWord().trim().isEmpty()) {
+            throw new InvalidSketchDataException("La parola selezionata per lo sketch non può essere vuota.");
+        }
+
         Sketch sketch = new Sketch(
                 authorUsername,
                 request.getWord().trim().toLowerCase()
@@ -46,14 +54,18 @@ public class SketchServiceImpl implements SketchService {
     @Override
     public SketchResponse completeSketch(String sketchId, String authorUsername, CompleteSketchRequest request) {
         Sketch sketch = sketchRepository.findById(sketchId)
-                .orElseThrow(() -> new IllegalArgumentException("Sketch non trovato"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sketch non trovato con ID: " + sketchId));
 
         if (!sketch.getAuthorUsername().equals(authorUsername)) {
-            throw new SecurityException("Non sei autorizzato a modificare questo sketch");
+            throw new UnauthorizedActionException("Non sei autorizzato a modificare questo sketch.");
         }
 
         if (sketch.isCompleted()) {
-            throw new IllegalStateException("Questo sketch è già stato completato");
+            throw new GameRuleViolationException("Questo sketch è già stato completato.");
+        }
+
+        if (request == null || request.getImageData() == null || request.getImageData().trim().isEmpty()) {
+            throw new InvalidSketchDataException("I dati dell'immagine dello sketch sono mancanti.");
         }
 
         sketch.setImageData(request.getImageData());

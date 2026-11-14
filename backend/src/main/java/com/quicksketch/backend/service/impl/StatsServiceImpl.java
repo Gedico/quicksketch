@@ -4,6 +4,7 @@ import com.quicksketch.backend.dto.stats.GlobalLeaderboardsResponse;
 import com.quicksketch.backend.dto.stats.GuesserLeaderboardEntry;
 import com.quicksketch.backend.dto.stats.SketcherLeaderboardEntry;
 import com.quicksketch.backend.dto.stats.UserProfileStatsResponse;
+import com.quicksketch.backend.exception.common.ResourceNotFoundException;
 import com.quicksketch.backend.model.User;
 import com.quicksketch.backend.repository.UserRepository;
 import com.quicksketch.backend.service.StatsService;
@@ -28,7 +29,6 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public GlobalLeaderboardsResponse getGlobalLeaderboards() {
         List<User> allUsers = userRepository.findAll();
-
 
         List<User> sketchersSorted = new ArrayList<>(allUsers);
         sketchersSorted.sort(
@@ -79,10 +79,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public UserProfileStatsResponse getPersonalStats(String username) {
-        GlobalLeaderboardsResponse boards = getGlobalLeaderboards();
-
         User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
+                .orElseThrow(() -> new ResourceNotFoundException("Utente non trovato: " + username));
+
+        GlobalLeaderboardsResponse boards = getGlobalLeaderboards();
 
         int sketcherRank = boards.getTopSketchers().stream()
                 .filter(e -> e.getUsername().equals(username))
@@ -148,7 +148,6 @@ public class StatsServiceImpl implements StatsService {
         double bayesianWinRate = (won + (BAYESIAN_PRIOR_GAMES * BAYESIAN_PRIOR_RATE))
                 / (totalGames + BAYESIAN_PRIOR_GAMES);
 
-        // Efficienza tentativi (max 10 tentativi per partita)
         double maxPossibleAttempts = (totalGames + 1) * 10.0;
         double efficiency = Math.max(0.0, 1.0 - (attemptsUsed / maxPossibleAttempts));
 

@@ -2,9 +2,12 @@ package com.quicksketch.backend.service.impl;
 
 import com.quicksketch.backend.dto.guess.GuessSessionResponse;
 import com.quicksketch.backend.dto.guess.InProgressGuessResponse;
+import com.quicksketch.backend.exception.common.ResourceNotFoundException;
+import com.quicksketch.backend.exception.common.UnauthorizedActionException;
+import com.quicksketch.backend.exception.game.GameRuleViolationException;
+import com.quicksketch.backend.exception.game.InvalidSketchDataException;
 import com.quicksketch.backend.model.Guess;
 import com.quicksketch.backend.model.Sketch;
-import com.quicksketch.backend.model.User;
 import com.quicksketch.backend.repository.GuessRepository;
 import com.quicksketch.backend.repository.SketchRepository;
 import com.quicksketch.backend.repository.UserRepository;
@@ -41,7 +44,7 @@ public class GuessServiceImpl implements GuessService {
         if (existingOpt.isPresent()) {
             Guess existing = existingOpt.get();
             if (existing.isFinished()) {
-                throw new IllegalStateException("Hai già completato questo sketch");
+                throw new GameRuleViolationException("Hai già completato questo sketch.");
             }
             return buildSessionResponse(sketch, existing);
         }
@@ -53,13 +56,17 @@ public class GuessServiceImpl implements GuessService {
 
     @Override
     public GuessSessionResponse submitAttempt(String username, String sketchId, String rawWord) {
+        if (rawWord == null || rawWord.trim().isEmpty()) {
+            throw new InvalidSketchDataException("Inserisci una parola valida prima di inviare il tentativo.");
+        }
+
         Sketch sketch = getValidPlayableSketch(username, sketchId);
 
         Guess guess = guessRepository.findByUsernameAndSketchId(username, sketchId)
                 .orElseGet(() -> guessRepository.save(new Guess(sketchId, username)));
 
         if (guess.isFinished()) {
-            throw new IllegalStateException("Questa partita è già terminata");
+            throw new GameRuleViolationException("Questa partita è già terminata.");
         }
 
         // Normalizzazione: ignora maiuscole/minuscole e spazi superflui
@@ -105,7 +112,7 @@ public class GuessServiceImpl implements GuessService {
                 .orElseGet(() -> guessRepository.save(new Guess(sketchId, username)));
 
         if (guess.isFinished()) {
-            throw new IllegalStateException("Questa partita è già terminata");
+            throw new GameRuleViolationException("Questa partita è già terminata.");
         }
 
         guess.setFinished(true);
@@ -141,35 +148,32 @@ public class GuessServiceImpl implements GuessService {
 
     private Sketch getValidPlayableSketch(String username, String sketchId) {
         Sketch sketch = sketchRepository.findById(sketchId)
-                .orElseThrow(() -> new IllegalArgumentException("Sketch non trovato"));
+                .orElseThrow(() -> new ResourceNotFoundException("Sketch non trovato con ID: " + sketchId));
 
         if (!sketch.isCompleted()) {
-            throw new IllegalStateException("Lo sketch non è ancora stato completato");
+            throw new GameRuleViolationException("Lo sketch non è ancora stato completato dall'autore.");
         }
 
         if (sketch.getAuthorUsername().equals(username)) {
-            throw new SecurityException("Non puoi indovinare un tuo stesso sketch");
+            throw new UnauthorizedActionException("Non puoi indovinare un tuo stesso sketch.");
         }
 
         return sketch;
     }
 
     private void applyWinStatistics(String playerUsername, Sketch sketch, int attemptsUsed) {
-        // 1. Statistiche giocatore che ha indovinato
         userRepository.findByUsername(playerUsername).ifPresent(player -> {
             player.setWordsGuessed(player.getWordsGuessed() + 1);
             player.setTotalGuessAttemptsUsed(player.getTotalGuessAttemptsUsed() + attemptsUsed);
             userRepository.save(player);
         });
 
-        // 2. Statistiche proprietario dello sketch
         userRepository.findByUsername(sketch.getAuthorUsername()).ifPresent(author -> {
             author.setSketchesPlayedByOthers(author.getSketchesPlayedByOthers() + 1);
             author.setSketchesGuessedByOthers(author.getSketchesGuessedByOthers() + 1);
             userRepository.save(author);
         });
 
-        // 3. Registra il giocatore nello sketch
         if (!sketch.getPlayedByUsernames().contains(playerUsername)) {
             sketch.getPlayedByUsernames().add(playerUsername);
             sketchRepository.save(sketch);
@@ -177,20 +181,17 @@ public class GuessServiceImpl implements GuessService {
     }
 
     private void applyLossStatistics(String playerUsername, Sketch sketch, int attemptsUsed) {
-        // 1. Statistiche giocatore che ha perso/abbandonato
         userRepository.findByUsername(playerUsername).ifPresent(player -> {
             player.setWordsFailed(player.getWordsFailed() + 1);
             player.setTotalGuessAttemptsUsed(player.getTotalGuessAttemptsUsed() + attemptsUsed);
             userRepository.save(player);
         });
 
-        // 2. Statistiche proprietario dello sketch (giocato ma non indovinato)
         userRepository.findByUsername(sketch.getAuthorUsername()).ifPresent(author -> {
             author.setSketchesPlayedByOthers(author.getSketchesPlayedByOthers() + 1);
             userRepository.save(author);
         });
 
-        // 3. Registra il giocatore nello sketch
         if (!sketch.getPlayedByUsernames().contains(playerUsername)) {
             sketch.getPlayedByUsernames().add(playerUsername);
             sketchRepository.save(sketch);
@@ -198,12 +199,9 @@ public class GuessServiceImpl implements GuessService {
     }
 
     private GuessSessionResponse buildSessionResponse(Sketch sketch, Guess guess) {
-        String status;
-        if (!guess.isFinished()) {
-            status = "IN_PROGRESS";
-        } else {
-            status = guess.isCorrect() ? "WON" : "LOST";
-        }
+        String status = !guess.isFinished()
+                ? "IN_PROGRESS"
+                : (guess.isCorrect() ? "WON" : "LOST");
 
         int remaining = Math.max(0, MAX_ATTEMPTS - guess.getAttemptsUsed());
         String revealedWord = guess.isFinished() ? sketch.getWord() : null;
